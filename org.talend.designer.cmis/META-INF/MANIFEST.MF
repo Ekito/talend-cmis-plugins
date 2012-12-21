@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CMIS external component
+Bundle-SymbolicName: org.talend.designer.cmis;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: Ekito
+Require-Bundle: org.talend.libraries.apache.chemistry,
+ org.eclipse.core.runtime,
+ org.talend.core,
+ org.talend.commons.ui,
+ org.talend.libraries.dom4j-jaxen,
+ org.talend.designer.codegen,
+ org.talend.core.runtime,
+ org.talend.designer.core,
+ org.talend.model,
+ org.talend.sqlbuilder
+Eclipse-LazyStart: true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
