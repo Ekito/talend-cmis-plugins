@@ -46,8 +46,8 @@ public class CMISComponent extends AbstractExternalNode {
 
 	public static String PLUGIN_ID = "org.talend.designer.cmis";
 	
-	public static String INPUT_COMPONENT_SUFFIX = "tCMISInput";
-	public static String OUTPUT_COMPONENT_SUFFIX = "tCMISOutput";
+	public static String INPUT_COMPONENT_SUFFIX = "Input";
+	public static String OUTPUT_COMPONENT_SUFFIX = "Output";
 
 	private CMISModelManager modelManager; // created on open()
 
