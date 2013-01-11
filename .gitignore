@@ -1,5 +1,5 @@
 *.class
-/class
+class/
 
 # Package Files #
 #*.jar
