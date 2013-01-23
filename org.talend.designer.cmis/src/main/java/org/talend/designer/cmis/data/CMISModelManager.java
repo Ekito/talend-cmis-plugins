@@ -386,16 +386,20 @@ public class CMISModelManager {
 			PropertyDefinition<?> propertyDef) {
 		// NB. reputting PARAM_ITEM_NAME is not required if the metadata with
 		// such a name already existed, but not a problem either
-		metadataMappingRow.put(PARAM_ITEM_ID, propertyDef.getId());
-		metadataMappingRow.put(PARAM_ITEM_NAME, propertyDef.getDisplayName());
-		metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType()
-				.value());
-		metadataMappingRow.put(PARAM_ITEM_MANDATORY, propertyDef.isRequired()
-				.toString());
-		List<?> defaultValue = propertyDef.getDefaultValue(); 
-		if (defaultValue != null)
+		if (metadataMappingRow != null
+				&& propertyDef != null)
 		{
-			metadataMappingRow.put(PARAM_ITEM_DEFAULT,	defaultValue.toString());
+			metadataMappingRow.put(PARAM_ITEM_ID, propertyDef.getId());
+			metadataMappingRow.put(PARAM_ITEM_NAME, propertyDef.getDisplayName());
+			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType()
+					.value());
+			metadataMappingRow.put(PARAM_ITEM_MANDATORY, propertyDef.isRequired()
+					.toString());
+			List<?> defaultValue = propertyDef.getDefaultValue(); 
+			if (defaultValue != null)
+			{
+				metadataMappingRow.put(PARAM_ITEM_DEFAULT,	defaultValue.toString());
+			}
 		}
 	}
 
