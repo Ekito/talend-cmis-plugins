@@ -24,7 +24,8 @@ Bundle-ClassPath: lib/chemistry-opencmis-client-api-0.7.0.jar,
  lib/saaj-api-1.3.jar,
  lib/saaj-impl-1.3.3.jar,
  lib/streambuffer-0.9.jar,
- lib/wstx-asl-3.2.3.jar
+ lib/wstx-asl-3.2.3.jar,
+ lib/stax-ex-1.2.jar
 Export-Package: org.apache.chemistry.opencmis.client.api,
  org.apache.chemistry.opencmis.client.bindings,
  org.apache.chemistry.opencmis.client.bindings.cache,
