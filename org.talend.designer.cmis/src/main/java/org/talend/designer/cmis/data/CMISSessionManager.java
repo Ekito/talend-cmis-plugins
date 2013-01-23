@@ -22,7 +22,10 @@ import org.talend.designer.cmis.CMISComponent;
 
 public class CMISSessionManager {
 	
-	public static final String PARAM_CMIS_SERVER_URL = "CMIS_SERVER_URL";
+	
+	public static final String PARAM_CMIS_BINDING_TYPE = "CMIS_BINDING_TYPE";
+	public static final String PARAM_CMIS_ATOMPUB_URL = "CMIS_ATOMPUB_URL";
+	public static final String PARAM_CMIS_WEBSERVICES_URL = "CMIS_WEBSERVICES_URL";
 	public static final String PARAM_CMIS_USER_LOGIN = "CMIS_USER_LOGIN";
 	public static final String PARAM_CMIS_USER_PASSWORD = "CMIS_USER_PASSWORD";
 	public static final String PARAM_CMIS_REPOSITORY = "CMIS_REPOSITORY";
@@ -39,10 +42,25 @@ public class CMISSessionManager {
 	}
 
 	private void initSession(CMISComponent cmisComponent2) {
-		String atomPubURL = (String) cmisComponent.getElementParameter(
-				PARAM_CMIS_SERVER_URL).getValue();
-		atomPubURL = atomPubURL.replaceAll("\"", "");
+		
+		String bindingType = (String) cmisComponent.getElementParameter(
+				PARAM_CMIS_BINDING_TYPE).getValue();
+		bindingType = bindingType.replaceAll("\"", "");
 
+		String atomPubURL = null;
+		String webServicesURL = null;
+		if (bindingType.equals(BindingType.ATOMPUB.value()))
+		{
+			atomPubURL = (String) cmisComponent.getElementParameter(
+					PARAM_CMIS_ATOMPUB_URL).getValue();
+			atomPubURL = atomPubURL.replaceAll("\"", "");
+		} else if (bindingType.equals(BindingType.WEBSERVICES.value()))
+		{
+			webServicesURL = (String) cmisComponent.getElementParameter(
+					PARAM_CMIS_WEBSERVICES_URL).getValue();
+			webServicesURL = webServicesURL.replaceAll("\"", "");
+		}
+		
 		String username = (String) cmisComponent.getElementParameter(
 				PARAM_CMIS_USER_LOGIN).getValue();
 		username = username.replaceAll("\"", "");
@@ -71,9 +89,25 @@ public class CMISSessionManager {
 		parameter.put(SessionParameter.PASSWORD, password);
 
 		// connection settings
-		parameter.put(SessionParameter.ATOMPUB_URL, atomPubURL);
-		parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB
-				.value());
+		if (bindingType.equals(BindingType.ATOMPUB.value()))
+		{
+			parameter.put(SessionParameter.ATOMPUB_URL, atomPubURL);
+			parameter.put(SessionParameter.BINDING_TYPE, bindingType);
+
+		} else if (bindingType.equals(BindingType.WEBSERVICES.value()))
+		{
+			parameter.put(SessionParameter.BINDING_TYPE, BindingType.WEBSERVICES.value());
+			parameter.put(SessionParameter.WEBSERVICES_ACL_SERVICE, webServicesURL + "/ACLService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE, webServicesURL + "/DiscoveryService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE, webServicesURL + "/MultiFilingService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE, webServicesURL + "/NavigationService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE, webServicesURL + "/ObjectService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_POLICY_SERVICE, webServicesURL + "/PolicyService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE, webServicesURL + "/RelationshipService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE, webServicesURL + "/RepositoryService?wsdl");
+			parameter.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE, webServicesURL + "/VersioningService?wsdl");
+		}
+		
 		parameter.put(SessionParameter.REPOSITORY_ID, repositoryId);
 
 		// session locale
