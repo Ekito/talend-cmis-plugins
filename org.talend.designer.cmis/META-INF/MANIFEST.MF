@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CMIS external component
 Bundle-SymbolicName: org.talend.designer.cmis;singleton:=true
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Ekito
 Require-Bundle: org.talend.libraries.apache.chemistry,
  org.eclipse.core.runtime,

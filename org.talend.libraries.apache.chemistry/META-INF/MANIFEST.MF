@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Chemistry plug-in
 Bundle-SymbolicName: org.talend.libraries.apache.chemistry
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Ekito
 Bundle-ClassPath: lib/chemistry-opencmis-client-api-0.7.0.jar,
  lib/chemistry-opencmis-client-impl-0.7.0.jar,
