@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.CMISObjectTypeNode;
+import org.talend.designer.cmis.data.TypeDefinitionModel;
 
 /**
  * A label provider that display the icon and name of the object type.
@@ -23,7 +23,7 @@ import org.talend.designer.cmis.data.CMISObjectTypeNode;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISObjectTypeLabelProvider implements ILabelProvider {
+public class TypeDefinitionLabelProvider implements ILabelProvider {
 
 	public static Image TABLE_ICON = ImageDescriptor.createFromFile(CMISComponent.class,"/icons/table.gif").createImage();
 	
@@ -32,7 +32,7 @@ public class CMISObjectTypeLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		return ((CMISObjectTypeNode)element).getDisplayName();
+		return ((TypeDefinitionModel)element).getDisplayName();
 	}
 
 	public void addListener(ILabelProviderListener listener) {

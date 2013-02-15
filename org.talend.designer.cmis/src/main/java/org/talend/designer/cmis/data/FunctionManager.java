@@ -12,26 +12,26 @@ package org.talend.designer.cmis.data;
 
 import org.talend.designer.cmis.CMISComponent;
 
-public class CMISFunctionManager {
+public class FunctionManager {
 
 	
 	private CMISComponent cmisComponent;
-	private CMISSessionManager sessionManager;
-	private CMISFolderManager cmisFolderManager;
+	private SessionManager sessionManager;
+	private FolderManager folderManager;
 	
-	public CMISFunctionManager(CMISComponent component,
-			CMISSessionManager sessionManager) {
+	public FunctionManager(CMISComponent component,
+			SessionManager sessionManager) {
 		this.cmisComponent = component;
 		this.sessionManager = sessionManager;
-		this.cmisFolderManager = new CMISFolderManager(component, sessionManager);
+		this.folderManager = new FolderManager(component, sessionManager);
 	}
 	
-	public CMISFolderManager getFolderManager() {
-		return cmisFolderManager;
+	public FolderManager getFolderManager() {
+		return folderManager;
 	}
 	
 	public void save() {
-		this.cmisFolderManager.save();
+		this.folderManager.save();
 		
 	}
 }

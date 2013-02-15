@@ -17,29 +17,29 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
 
-public class CMISFolderNode {
+public class FolderModel {
 
 	
-	private CMISFolderNode parentFolder;
+	private FolderModel parentFolder;
 	private Folder folder;
-	private ArrayList<CMISFolderNode> children;
+	private ArrayList<FolderModel> children;
 	private String displayName;
 	
-	public CMISFolderNode(CMISFolderNode parent, Folder folder) {
+	public FolderModel(FolderModel parent, Folder folder) {
 		this.parentFolder = parent;
 		this.folder = folder;
 	}
 	
-	public ArrayList<CMISFolderNode> getChildren()
+	public ArrayList<FolderModel> getChildren()
 	{
 		if (children == null)
 		{
-			children = new ArrayList<CMISFolderNode>();
+			children = new ArrayList<FolderModel>();
 			List<Tree<FileableCmisObject>> folderTree = folder.getFolderTree(1);
 			
 			for (Tree<FileableCmisObject> tree : folderTree) {
 				Folder childFolder = (Folder) tree.getItem();
-				children.add(new CMISFolderNode(this, childFolder));
+				children.add(new FolderModel(this, childFolder));
 				
 			}
 		}
@@ -47,7 +47,7 @@ public class CMISFolderNode {
 		return children;
 	}
 	
-	public CMISFolderNode getParent() {
+	public FolderModel getParent() {
 		return parentFolder;
 	}
 

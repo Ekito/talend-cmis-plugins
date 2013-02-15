@@ -18,33 +18,33 @@ import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
 import org.talend.designer.cmis.CMISComponent;
 
-public class CMISFolderManager {
+public class FolderManager {
 	
 	private CMISComponent cmisComponent;
-	private CMISSessionManager sessionManager;
-	private ArrayList<CMISFolderNode> rootFolderNodes;
+	private SessionManager sessionManager;
+	private ArrayList<FolderModel> rootFolderNodes;
 	private String selectedFolderPath;
 
-	public CMISFolderManager(CMISComponent component,
-			CMISSessionManager sessionManager) {
+	public FolderManager(CMISComponent component,
+			SessionManager sessionManager) {
 		this.cmisComponent = component;
 		this.sessionManager = sessionManager;
 	}
 	
-	public ArrayList<CMISFolderNode> getRootFolderNodes()
+	public ArrayList<FolderModel> getRootFolderNodes()
 	{
 
 		if (rootFolderNodes == null)
 		{
-			rootFolderNodes = new ArrayList<CMISFolderNode>();
+			rootFolderNodes = new ArrayList<FolderModel>();
 			Folder rootFolder = sessionManager.getSession().getRootFolder();
 			List<Tree<FileableCmisObject>> childFolders = rootFolder.getFolderTree(1);
 			
-			CMISFolderNode rootFolderNode = new CMISFolderNode(null, rootFolder);
+			FolderModel rootFolderNode = new FolderModel(null, rootFolder);
 			
 			for (Tree<FileableCmisObject> childFolderTree : childFolders) {
 				Folder childFolder = (Folder) childFolderTree.getItem();
-				rootFolderNodes.add(new CMISFolderNode(rootFolderNode, childFolder));
+				rootFolderNodes.add(new FolderModel(rootFolderNode, childFolder));
 				
 			}
 			

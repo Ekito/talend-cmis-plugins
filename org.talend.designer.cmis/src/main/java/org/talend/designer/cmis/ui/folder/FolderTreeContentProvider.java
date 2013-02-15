@@ -16,7 +16,7 @@ import java.util.Comparator;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.talend.designer.cmis.data.CMISFolderNode;
+import org.talend.designer.cmis.data.FolderModel;
 
 /**
  * Provide the content of a tree that displays the object type list.
@@ -24,16 +24,16 @@ import org.talend.designer.cmis.data.CMISFolderNode;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISFolderTreeContentProvider implements ITreeContentProvider {
+public class FolderTreeContentProvider implements ITreeContentProvider {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object parentElement) {
 		
-		ArrayList<CMISFolderNode> childrenList = ((CMISFolderNode)parentElement).getChildren();
-		Collections.sort(childrenList, new Comparator<CMISFolderNode>() {
-			public int compare(CMISFolderNode o1, CMISFolderNode o2)
+		ArrayList<FolderModel> childrenList = ((FolderModel)parentElement).getChildren();
+		Collections.sort(childrenList, new Comparator<FolderModel>() {
+			public int compare(FolderModel o1, FolderModel o2)
 			{
 				return o1.getFolderId().compareTo(o2.getFolderId());
 			};
@@ -47,7 +47,7 @@ public class CMISFolderTreeContentProvider implements ITreeContentProvider {
 	 */
 	public Object getParent(Object element) {
 		
-		return ((CMISFolderNode)element).getParent();
+		return ((FolderModel)element).getParent();
 	}
 
 	/* (non-Javadoc)

@@ -19,18 +19,18 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 
-public class CMISObjectTypeNode {
+public class TypeDefinitionModel {
 
-	private CMISObjectTypeNode parent;
+	private TypeDefinitionModel parent;
 	private String objectTypeId;
 	private String baseTypeId;
 	
-	private ArrayList<CMISObjectTypeNode> children;
+	private ArrayList<TypeDefinitionModel> children;
 	private PropertyDefinition<?>[] propertyDefinitions;
 	private String displayName;
 	private ObjectType objectType;
 	
-	public CMISObjectTypeNode(CMISObjectTypeNode parent, ObjectType objectType) {
+	public TypeDefinitionModel(TypeDefinitionModel parent, ObjectType objectType) {
 		super();
 		this.objectType = objectType;
 		this.parent = parent;
@@ -39,11 +39,11 @@ public class CMISObjectTypeNode {
 		this.displayName = objectType.getDisplayName();
 	}
 	
-	public CMISObjectTypeNode getParent() {
+	public TypeDefinitionModel getParent() {
 		return parent;
 	}
 
-	public ArrayList<CMISObjectTypeNode> getChildren() {
+	public ArrayList<TypeDefinitionModel> getChildren() {
 		if (children == null)
 		{
 			fillChildren(objectType);
@@ -78,29 +78,29 @@ public class CMISObjectTypeNode {
 	}
 
 	private void fillChildren(ObjectType objectType) {
-		children = new ArrayList<CMISObjectTypeNode>();
+		children = new ArrayList<TypeDefinitionModel>();
 		ItemIterable<ObjectType> childrenIterable = objectType.getChildren();
 
 		for (Iterator<ObjectType> iterator = childrenIterable.iterator(); iterator
 				.hasNext();) {
 			ObjectType child = (ObjectType) iterator.next();
 
-			CMISObjectTypeNode childNode = new CMISObjectTypeNode(this, child);
+			TypeDefinitionModel childNode = new TypeDefinitionModel(this, child);
 			children.add(childNode);
 		}
 
 	}
 	
-	public CMISObjectTypeNode findById(String objectTypeId) {
-		CMISObjectTypeNode result = null;
+	public TypeDefinitionModel findById(String objectTypeId) {
+		TypeDefinitionModel result = null;
 
 		if (objectTypeId.equals(this.objectTypeId)) {
 			result = this;
 		} else {
-			for (Iterator<CMISObjectTypeNode> iterator = getChildren().iterator(); iterator
+			for (Iterator<TypeDefinitionModel> iterator = getChildren().iterator(); iterator
 					.hasNext()
 					&& result == null;) {
-				CMISObjectTypeNode child = (CMISObjectTypeNode) iterator.next();
+				TypeDefinitionModel child = (TypeDefinitionModel) iterator.next();
 				result = child.findById(objectTypeId);
 			}
 		}

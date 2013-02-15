@@ -14,7 +14,7 @@ import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
-public class CMISPropertiesComparator extends ViewerComparator {
+public class PropertyDefinitionComparator extends ViewerComparator {
 
 	public final static int ID	= 0;
 	public final static int NAME		= 1;
@@ -26,7 +26,7 @@ public class CMISPropertiesComparator extends ViewerComparator {
 	private static final int DESCENDING = 1;
 	private int direction = DESCENDING;
 
-	public CMISPropertiesComparator() {
+	public PropertyDefinitionComparator() {
 		this.propertyIndex = 0;
 		direction = DESCENDING;
 	}

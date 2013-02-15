@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.talend.designer.cmis.i18n.Messages;
 
-public class CMISPropertiesTableViewer extends CheckboxTableViewer {
+public class PropertyDefinitionTableViewer extends CheckboxTableViewer {
 
 	private static String ID_COLUMN = Messages.getString("cmis.attributesTable.idColumnName");  
 	private static String NAME_COLUMN = Messages.getString("cmis.attributesTable.nameColumnName");
@@ -29,16 +29,16 @@ public class CMISPropertiesTableViewer extends CheckboxTableViewer {
 	private static String MANDATORY_COLUMN = Messages.getString("cmis.attributesTable.mandatoryColumnName");
 	private static String DEFAULT_COLUMN = Messages.getString("cmis.attributesTable.defaultColumnName");
 	
-	private CMISPropertiesComparator propertiesComparator;
+	private PropertyDefinitionComparator propertiesComparator;
 
-	public CMISPropertiesTableViewer(Table table) {
+	public PropertyDefinitionTableViewer(Table table) {
 		super(table);
 		
 		
 		// Set the default sorter for the viewer
-		propertiesComparator = new CMISPropertiesComparator();
+		propertiesComparator = new PropertyDefinitionComparator();
 		setComparator(propertiesComparator);
-		propertiesComparator.setColumn(CMISPropertiesComparator.ID);
+		propertiesComparator.setColumn(PropertyDefinitionComparator.ID);
 		
 		//Get the table and set the layout and table column titles
 		Table propertiesTable = getTable();
@@ -91,9 +91,9 @@ public class CMISPropertiesTableViewer extends CheckboxTableViewer {
 		return selectionAdapter;
 	}
 	
-	public static CMISPropertiesTableViewer newCheckList(Composite parent, int style) {
+	public static PropertyDefinitionTableViewer newCheckList(Composite parent, int style) {
         Table table = new Table(parent, SWT.CHECK | style);
-        return new CMISPropertiesTableViewer(table);
+        return new PropertyDefinitionTableViewer(table);
     }
 
 }

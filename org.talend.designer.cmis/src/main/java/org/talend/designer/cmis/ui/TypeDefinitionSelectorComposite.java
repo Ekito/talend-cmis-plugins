@@ -24,30 +24,30 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.CMISModelManager;
-import org.talend.designer.cmis.data.CMISObjectTypeNode;
+import org.talend.designer.cmis.data.TypeDefinitionManager;
+import org.talend.designer.cmis.data.TypeDefinitionModel;
 import org.talend.designer.cmis.i18n.Messages;
-import org.talend.designer.cmis.ui.metadata.CMISObjectTypeLabelProvider;
-import org.talend.designer.cmis.ui.metadata.CMISObjectTypeTreeContentProvider;
-import org.talend.designer.cmis.ui.metadata.CMISObjectTypeTreeViewer;
-import org.talend.designer.cmis.ui.metadata.CMISPropertiesTableViewer;
-import org.talend.designer.cmis.ui.metadata.CMISPropertyContentProvider;
-import org.talend.designer.cmis.ui.metadata.CMISPropertyLabelProvider;
+import org.talend.designer.cmis.ui.metadata.TypeDefinitionLabelProvider;
+import org.talend.designer.cmis.ui.metadata.TypeDefinitionTreeContentProvider;
+import org.talend.designer.cmis.ui.metadata.TypeDefinitionTreeViewer;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionTableViewer;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionContentProvider;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionLabelProvider;
 
-public class CMISTypeSelectorComposite extends Composite {
+public class TypeDefinitionSelectorComposite extends Composite {
 
-	private CMISModelManager modelManager;
-	private CMISObjectTypeTreeViewer objectTypeTreeViewer;
-	private CMISPropertiesTableViewer propertiesTableViewer;
+	private TypeDefinitionManager modelManager;
+	private TypeDefinitionTreeViewer objectTypeTreeViewer;
+	private PropertyDefinitionTableViewer propertiesTableViewer;
 
-	private CMISTypeSelectorComposite(Composite parent, int style) {
+	private TypeDefinitionSelectorComposite(Composite parent, int style) {
 		super(parent, style);
         GridLayout layout = new GridLayout();
         layout.numColumns = 1;
         setLayout(layout);
 	}
 	
-	public CMISTypeSelectorComposite(Composite parent, int style, CMISModelManager modelManager) {
+	public TypeDefinitionSelectorComposite(Composite parent, int style, TypeDefinitionManager modelManager) {
 		this(parent, style);
 		
 		this.modelManager = modelManager;
@@ -113,16 +113,16 @@ public class CMISTypeSelectorComposite extends Composite {
     }
 	
 	private void createCMISTypesTree(Composite typeComposite) {
-		objectTypeTreeViewer = new CMISObjectTypeTreeViewer(typeComposite, SWT.FULL_SELECTION);
+		objectTypeTreeViewer = new TypeDefinitionTreeViewer(typeComposite, SWT.FULL_SELECTION);
 		
-		objectTypeTreeViewer.setContentProvider(new CMISObjectTypeTreeContentProvider());
-		objectTypeTreeViewer.setLabelProvider(new CMISObjectTypeLabelProvider());
+		objectTypeTreeViewer.setContentProvider(new TypeDefinitionTreeContentProvider());
+		objectTypeTreeViewer.setLabelProvider(new TypeDefinitionLabelProvider());
 		
-		ArrayList<CMISObjectTypeNode> treeInput = modelManager.getAvailableObjectTypeNodes();
+		ArrayList<TypeDefinitionModel> treeInput = modelManager.getAvailableTypeDefinition();
 		objectTypeTreeViewer.setInput(treeInput);
 		
 		//Select the current object type in the tree
-		CMISObjectTypeNode selectedObjectType = modelManager.getSelectedObjectTypeNode();
+		TypeDefinitionModel selectedObjectType = modelManager.getSelectedTypeDefinition();
 		objectTypeTreeViewer.setSelection(selectedObjectType, true);
 		
 	}
@@ -145,10 +145,10 @@ public class CMISTypeSelectorComposite extends Composite {
 	
 	private void createCMISAttributesTable(Composite attributeComposite) {
 		
-		propertiesTableViewer = CMISPropertiesTableViewer.newCheckList(attributeComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		propertiesTableViewer = PropertyDefinitionTableViewer.newCheckList(attributeComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		
-		propertiesTableViewer.setContentProvider(new CMISPropertyContentProvider());
-		propertiesTableViewer.setLabelProvider(new CMISPropertyLabelProvider());
+		propertiesTableViewer.setContentProvider(new PropertyDefinitionContentProvider());
+		propertiesTableViewer.setLabelProvider(new PropertyDefinitionLabelProvider());
 		
 		// The input for the table viewer is the list of available properties for the selected object.
 		PropertyDefinition<?>[] propertyDefinitions = modelManager.getAvailablePropertyDefinitions();
@@ -207,11 +207,11 @@ public class CMISTypeSelectorComposite extends Composite {
 	
 	
 	
-	public CMISObjectTypeTreeViewer getObjectTypeTreeViewer() {
+	public TypeDefinitionTreeViewer getObjectTypeTreeViewer() {
 		return objectTypeTreeViewer;
 	}
 	
-	public CMISPropertiesTableViewer getPropertiesTableViewer() {
+	public PropertyDefinitionTableViewer getPropertiesTableViewer() {
 		return propertiesTableViewer;
 	}
 	

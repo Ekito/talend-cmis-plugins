@@ -21,9 +21,9 @@ import org.talend.core.model.process.AbstractNode;
 import org.talend.core.model.process.EConnectionType;
 import org.talend.core.model.process.IConnection;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.CMISEditorManager;
+import org.talend.designer.cmis.data.EditorManager;
 import org.talend.designer.cmis.i18n.Messages;
-import org.talend.designer.cmis.ui.CMISEditorDialog;
+import org.talend.designer.cmis.ui.EditorDialog;
 
 /**
  * This class holds the model and UI managers on behalf of the component.
@@ -31,15 +31,15 @@ import org.talend.designer.cmis.ui.CMISEditorDialog;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISEditorController {
+public class EditorController {
 
 	private CMISComponent cmisComponent;
-	private CMISEditorDialog cmisEditorDialog;
-	private CMISEditorManager editorManager;
+	private EditorDialog cmisEditorDialog;
+	private EditorManager editorManager;
 
-	public CMISEditorController(CMISComponent cmisComponent) {
+	public EditorController(CMISComponent cmisComponent) {
 		this.cmisComponent = cmisComponent;
-		this.editorManager = new CMISEditorManager(cmisComponent);
+		this.editorManager = new EditorManager(cmisComponent);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class CMISEditorController {
 	/**
 	 * @return the dialog for selecting the object type
 	 */
-	public CMISEditorDialog getCMISModelDialog() {
+	public EditorDialog getCMISModelDialog() {
 		return cmisEditorDialog;
 	}
 
@@ -62,7 +62,7 @@ public class CMISEditorController {
 	 * @param parent
 	 * @return
 	 */
-	public CMISEditorDialog createUI(Composite parent) {
+	public EditorDialog createUI(Composite parent) {
 		IConnection inConn = null;
 		AbstractNode connector = this.cmisComponent;
 		for (IConnection conn : connector.getIncomingConnections()) {
@@ -97,7 +97,7 @@ public class CMISEditorController {
 		}
 
 		// then create and open the model dialog :
-		CMISEditorDialog cmisEditorDialog = new CMISEditorDialog(
+		EditorDialog cmisEditorDialog = new EditorDialog(
 				parent.getShell(), editorManager);
 		
 		//Set Model, image and others...

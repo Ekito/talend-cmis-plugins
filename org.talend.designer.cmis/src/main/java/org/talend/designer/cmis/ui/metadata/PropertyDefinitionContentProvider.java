@@ -14,7 +14,7 @@ import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-public class CMISPropertyContentProvider implements IStructuredContentProvider {
+public class PropertyDefinitionContentProvider implements IStructuredContentProvider {
 
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof PropertyDefinition<?>[])

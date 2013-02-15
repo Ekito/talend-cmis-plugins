@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.CMISFolderNode;
+import org.talend.designer.cmis.data.FolderModel;
 
 /**
  * A label provider that display the icon and name of the object type.
@@ -23,7 +23,7 @@ import org.talend.designer.cmis.data.CMISFolderNode;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISFolderLabelProvider implements ILabelProvider {
+public class FolderLabelProvider implements ILabelProvider {
 
 	public static Image CLOSED_FOLDER_ICON = ImageDescriptor.createFromFile(CMISComponent.class,"/icons/closedFolder.gif").createImage();
 	public static Image OPEN_FOLDER_ICON = ImageDescriptor.createFromFile(CMISComponent.class,"/icons/openFolder.gif").createImage();
@@ -39,7 +39,7 @@ public class CMISFolderLabelProvider implements ILabelProvider {
 	}
 
 	public String getText(Object element) {
-		return ((CMISFolderNode)element).getDisplayName();
+		return ((FolderModel)element).getDisplayName();
 	}
 
 	public void addListener(ILabelProviderListener listener) {

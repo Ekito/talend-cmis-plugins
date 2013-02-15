@@ -21,7 +21,7 @@ import org.talend.commons.ui.runtime.image.ECoreImage;
 import org.talend.commons.ui.runtime.image.ImageProvider;
 import org.talend.designer.cmis.CMISComponent;
 
-public class CMISPropertyLabelProvider implements ITableLabelProvider {
+public class PropertyDefinitionLabelProvider implements ITableLabelProvider {
 
 	public static Image COLUMN_ICON = ImageDescriptor.createFromFile(CMISComponent.class,"/icons/columns.gif").createImage();
 	

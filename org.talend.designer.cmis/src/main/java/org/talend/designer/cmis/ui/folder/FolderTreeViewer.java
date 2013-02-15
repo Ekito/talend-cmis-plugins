@@ -8,29 +8,50 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.ui.metadata;
+package org.talend.designer.cmis.ui.folder;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.talend.designer.cmis.data.CMISObjectTypeNode;
+import org.eclipse.swt.widgets.TreeItem;
+import org.talend.designer.cmis.data.FolderModel;
 
-public class CMISObjectTypeTreeViewer extends TreeViewer {
+public class FolderTreeViewer extends TreeViewer {
 
-	public CMISObjectTypeTreeViewer(Composite parent, int style) {
+	
+	public FolderTreeViewer(Composite parent, int style) {
 		super(parent, style);
 		
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		getControl().setLayoutData(gridData);
 		
+		getTree().addTreeListener(new TreeListener() {
+			
+			public void treeCollapsed(TreeEvent e) {
+			    updateImage((TreeItem) e.item, true);
+			  }
+
+			  public void treeExpanded(TreeEvent e) {
+			    updateImage((TreeItem) e.item, false);
+			  }
+
+			  private void updateImage(TreeItem item, boolean isCollapsed) {
+			    Image image = isCollapsed ? FolderLabelProvider.CLOSED_FOLDER_ICON : FolderLabelProvider.OPEN_FOLDER_ICON;
+			    item.setImage(image);
+			  }
+		});
 	}
 	
-	public void setSelection(CMISObjectTypeNode selection, boolean reveal) {
+	public void setSelection(FolderModel selection, boolean reveal) {
 		super.setSelection(new StructuredSelection(selection), reveal);
 		expandToLevel(selection, 1);
 		getControl().setFocus();
 		
 	}
 
+	
 }

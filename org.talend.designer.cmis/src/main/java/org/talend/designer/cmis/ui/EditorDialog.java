@@ -32,9 +32,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.talend.commons.ui.runtime.image.ImageUtils.ICON_SIZE;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.ui.images.CoreImageProvider;
-import org.talend.designer.cmis.data.CMISEditorManager;
-import org.talend.designer.cmis.data.CMISModelManager;
-import org.talend.designer.cmis.data.CMISObjectTypeNode;
+import org.talend.designer.cmis.data.EditorManager;
+import org.talend.designer.cmis.data.TypeDefinitionManager;
+import org.talend.designer.cmis.data.TypeDefinitionModel;
 
 /**
  * Dialog allowing to choose typing, i.e. a CMIS base type and CMIS object type within CMIS model definitions.
@@ -42,14 +42,14 @@ import org.talend.designer.cmis.data.CMISObjectTypeNode;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISEditorDialog extends Dialog {
+public class EditorDialog extends Dialog {
 
-	private CMISEditorManager editorManager;
+	private EditorManager editorManager;
 
-	private CMISTypeSelectorComposite typesComposite;
-	private CMISFunctionEditorComposite functionComposite;
+	private TypeDefinitionSelectorComposite typesComposite;
+	private FunctionEditorComposite functionComposite;
 
-	public CMISEditorDialog(Shell parentShell, CMISEditorManager editorManager) {
+	public EditorDialog(Shell parentShell, EditorManager editorManager) {
 		super(parentShell);
 		this.editorManager = editorManager;
 
@@ -99,21 +99,21 @@ public class CMISEditorDialog extends Dialog {
 	private void createCMISTypesArea(Composite composite)
 	{
 		
-		typesComposite = new CMISTypeSelectorComposite(composite, SWT.BORDER, editorManager.getModelManager());
+		typesComposite = new TypeDefinitionSelectorComposite(composite, SWT.BORDER, editorManager.getModelManager());
 		((Tree)typesComposite.getObjectTypeTreeViewer().getControl()).addSelectionListener(new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent e) {
 				Object selectedData = e.item.getData();
-				if (selectedData instanceof CMISObjectTypeNode)
+				if (selectedData instanceof TypeDefinitionModel)
 				{
-					CMISModelManager modelManager = editorManager.getModelManager();
+					TypeDefinitionManager modelManager = editorManager.getModelManager();
 					//Get the previous selected properties
 					Map<String,PropertyDefinition<?>> previousSelectedPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>(modelManager.getSelectedPropertyDefinitions());
 					
 					//Clear the selected properties on the data model
 					modelManager.clearSelectedPropertyDefinition();
 					
-					CMISObjectTypeNode selectedObjectTypeNode = (CMISObjectTypeNode)selectedData;
+					TypeDefinitionModel selectedObjectTypeNode = (TypeDefinitionModel)selectedData;
 					//Set the selected type node and the default selected property definitions 
 					modelManager.setSelectedObjectTypeNode(selectedObjectTypeNode);
 
@@ -144,7 +144,7 @@ public class CMISEditorDialog extends Dialog {
 	
 	private void createCMISFunctionArea(Composite composite) {
 		
-		functionComposite = new CMISFunctionEditorComposite(composite, SWT.BORDER, editorManager.getFunctionManager());
+		functionComposite = new FunctionEditorComposite(composite, SWT.BORDER, editorManager.getFunctionManager());
 	}
 	
 	private void createCMISQueryArea(Composite composite) {

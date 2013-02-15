@@ -16,7 +16,7 @@ import java.util.Comparator;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.talend.designer.cmis.data.CMISObjectTypeNode;
+import org.talend.designer.cmis.data.TypeDefinitionModel;
 
 /**
  * Provide the content of a tree that displays the object type list.
@@ -24,16 +24,16 @@ import org.talend.designer.cmis.data.CMISObjectTypeNode;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISObjectTypeTreeContentProvider implements ITreeContentProvider {
+public class TypeDefinitionTreeContentProvider implements ITreeContentProvider {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object parentElement) {
 		
-		ArrayList<CMISObjectTypeNode> childrenList = ((CMISObjectTypeNode)parentElement).getChildren();
-		Collections.sort(childrenList, new Comparator<CMISObjectTypeNode>() {
-			public int compare(CMISObjectTypeNode o1, CMISObjectTypeNode o2)
+		ArrayList<TypeDefinitionModel> childrenList = ((TypeDefinitionModel)parentElement).getChildren();
+		Collections.sort(childrenList, new Comparator<TypeDefinitionModel>() {
+			public int compare(TypeDefinitionModel o1, TypeDefinitionModel o2)
 			{
 				return o1.getObjectTypeId().compareTo(o2.getObjectTypeId());
 			};
@@ -47,7 +47,7 @@ public class CMISObjectTypeTreeContentProvider implements ITreeContentProvider {
 	 */
 	public Object getParent(Object element) {
 		
-		return ((CMISObjectTypeNode)element).getParent();
+		return ((TypeDefinitionModel)element).getParent();
 	}
 
 	/* (non-Javadoc)

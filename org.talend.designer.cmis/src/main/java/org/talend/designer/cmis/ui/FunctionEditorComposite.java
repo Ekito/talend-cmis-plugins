@@ -19,17 +19,17 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.talend.designer.cmis.data.CMISFunctionManager;
+import org.talend.designer.cmis.data.FunctionManager;
 import org.talend.designer.cmis.i18n.Messages;
-import org.talend.designer.cmis.ui.folder.CMISFolderDialog;
+import org.talend.designer.cmis.ui.folder.FolderDialog;
 
-public class CMISFunctionEditorComposite extends Composite {
+public class FunctionEditorComposite extends Composite {
 
-	private CMISFunctionManager functionManager;
-	private CMISFolderDialog folderDialog;
+	private FunctionManager functionManager;
+	private FolderDialog folderDialog;
 	private Text folderPath;
 
-	private CMISFunctionEditorComposite(Composite parent, int style) {
+	private FunctionEditorComposite(Composite parent, int style) {
 		super(parent, style);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
@@ -45,7 +45,7 @@ public class CMISFunctionEditorComposite extends Composite {
 
 	}
 
-	public CMISFunctionEditorComposite(Composite parent, int style, CMISFunctionManager functionManager){
+	public FunctionEditorComposite(Composite parent, int style, FunctionManager functionManager){
 		this(parent, style);
 
 		this.functionManager = functionManager;
@@ -106,7 +106,7 @@ public class CMISFunctionEditorComposite extends Composite {
 		button.setText("Browse");
 		button.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 
-		folderDialog = new CMISFolderDialog(this.getShell(), functionManager.getFolderManager());
+		folderDialog = new FolderDialog(this.getShell(), functionManager.getFolderManager());
 		Listener openerListener = new Listener() {
 			public void handleEvent(Event event) {
 				folderDialog.open();

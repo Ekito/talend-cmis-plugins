@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.talend.designer.cmis.data.CMISFolderManager;
-import org.talend.designer.cmis.data.CMISFolderNode;
+import org.talend.designer.cmis.data.FolderManager;
+import org.talend.designer.cmis.data.FolderModel;
 import org.talend.designer.cmis.i18n.Messages;
 
 /**
@@ -36,15 +36,15 @@ import org.talend.designer.cmis.i18n.Messages;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISFolderDialog extends Dialog {
+public class FolderDialog extends Dialog {
 
-	private CMISFolderTreeViewer folderTreeViewer;
+	private FolderTreeViewer folderTreeViewer;
 
 	private String folderPath;
 
-	private CMISFolderManager folderManager;
+	private FolderManager folderManager;
 
-	public CMISFolderDialog(Shell parentShell, CMISFolderManager folderManager) {
+	public FolderDialog(Shell parentShell, FolderManager folderManager) {
 		super(parentShell);
 		
 		this.folderManager = folderManager;
@@ -75,12 +75,12 @@ public class CMISFolderDialog extends Dialog {
 
 		
 		//The tree displaying the folder tree
-		folderTreeViewer = new CMISFolderTreeViewer(composite, SWT.FULL_SELECTION);
+		folderTreeViewer = new FolderTreeViewer(composite, SWT.FULL_SELECTION);
 		
-		folderTreeViewer.setContentProvider(new CMISFolderTreeContentProvider());
-		folderTreeViewer.setLabelProvider(new CMISFolderLabelProvider());
+		folderTreeViewer.setContentProvider(new FolderTreeContentProvider());
+		folderTreeViewer.setLabelProvider(new FolderLabelProvider());
 		
-		ArrayList<CMISFolderNode> rootFolderNodes = folderManager.getRootFolderNodes();
+		ArrayList<FolderModel> rootFolderNodes = folderManager.getRootFolderNodes();
 //		ArrayList<CMISObjectTypeNode> treeInput = modelManager.getAvailableObjectTypeNodes();
 //		ArrayList<CMISFolderNode> folderList = new ArrayList<CMISFolderNode>();
 //		folderList.add(rootFolderNode);
@@ -95,7 +95,7 @@ public class CMISFolderDialog extends Dialog {
 		((Tree)folderTreeViewer.getControl()).addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent e) {
-				CMISFolderNode selectedData = (CMISFolderNode) e.item.getData();
+				FolderModel selectedData = (FolderModel) e.item.getData();
 				folderManager.setSelectedFolderPath(selectedData.getFolderPath());
 
 			}

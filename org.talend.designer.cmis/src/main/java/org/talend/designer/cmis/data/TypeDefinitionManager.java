@@ -20,11 +20,8 @@ import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
-import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
-import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.query.Query;
 
 /**
  * This class holds the model and UI managers on behalf of the component.
@@ -32,54 +29,49 @@ import org.talend.designer.cmis.query.Query;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class CMISModelManager {
+public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 
 	public static final String PARAM_OBJECT_TYPE = "OBJECT_TYPE";
 
 	public static final String PARAM_BASE_TYPE_ID = "BASE_TYPE_ID";
 
-	public static final String PARAM_QUERY = "QUERY";
-
 	// property mapping and additional items
 	public static final String PARAM_PROPERTY_MAPPING = "PROPERTY_MAPPING";
 
+	public static final String PARAM_OBJECT_TYPE_ID = "OBJECT_TYPE_ID";
+	
 	public static final String PARAM_ITEM_ID = "ID";
-
-	public static final String PARAM_ITEM_NAME = "NAME";
 
 	public static final String PARAM_ITEM_TYPE = "TYPE";
 
-	public static final String PARAM_ITEM_MANDATORY = "MANDATORY";
-
 	public static final String PARAM_ITEM_DEFAULT = "DEFAULT";
 
-	private static final int UNKNOWN_FILTER = 0;
-	
-	private static final int QUERYABLE_FILTER = 1;
-	
-	private static final int UPDATABLE_FILTER = 2;
-	
 	private CMISComponent cmisComponent;
-	private CMISSessionManager cmisSessionManager;
+	
+	private SessionManager sessionManager;
+
+	public SessionManager getSessionManager() {
+		return sessionManager;
+	}
 
 	// data model
-	private ArrayList<CMISObjectTypeNode> availableObjectTypeNodes = new ArrayList<CMISObjectTypeNode>();
+	private ArrayList<TypeDefinitionModel> availableTypeDefinitionModel = new ArrayList<TypeDefinitionModel>();
 	private PropertyDefinition<?>[] availablePropertyDefinitions;
 	private HashMap<String, PropertyDefinition<?>> availablePropertyDefinitionsMap;
 	
-	private CMISObjectTypeNode selectedObjectTypeNode;
+	private TypeDefinitionModel selectedTypeDefinitionModel;
 	private Map<String, PropertyDefinition<?>> selectedPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>();
 
-	public CMISModelManager(CMISComponent cmisComponent, CMISSessionManager sessionManager) {
+	public TypeDefinitionManager(CMISComponent cmisComponent, SessionManager sessionManager) {
 		this.cmisComponent = cmisComponent;
-		this.cmisSessionManager = sessionManager;
+		this.sessionManager = sessionManager;
 	}
 
 	/**
 	 * @return the object types available in the cmis database
 	 */
-	public ArrayList<CMISObjectTypeNode> getAvailableObjectTypeNodes() {
-		return availableObjectTypeNodes;
+	public ArrayList<TypeDefinitionModel> getAvailableTypeDefinition() {
+		return availableTypeDefinitionModel;
 	}
 	
 	public PropertyDefinition<?>[] getAvailablePropertyDefinitions() {
@@ -90,59 +82,13 @@ public class CMISModelManager {
 		return availablePropertyDefinitionsMap;
 	}
 
-	public void setAvailablePropertyDefinitionsMap(
-			HashMap<String, PropertyDefinition<?>> availablePropertyDefinitionMap) {
-		this.availablePropertyDefinitionsMap = availablePropertyDefinitionMap;
-	}
-
-	private PropertyDefinition<?>[] filterPropertyDefinitions(
-			PropertyDefinition<?>[] availablePropertyDefinitions) {
-		
-		String componentName = (String) cmisComponent.getElementParameter("COMPONENT_NAME").getValue();
-		int filterType = UNKNOWN_FILTER;
-		
-		if (componentName.endsWith(CMISComponent.INPUT_COMPONENT_SUFFIX))
-			filterType = QUERYABLE_FILTER;
-		else if (componentName.endsWith(CMISComponent.OUTPUT_COMPONENT_SUFFIX))
-			filterType = UPDATABLE_FILTER;
-		
-		if (filterType == UNKNOWN_FILTER)
-		{
-			return availablePropertyDefinitions;
-		}
-		
-		ArrayList<PropertyDefinition<?>> selectablePropertyDefinition = new ArrayList<PropertyDefinition<?>>();
-		
-		for (int i = 0; i < availablePropertyDefinitions.length; i++) {
-			PropertyDefinition<?> propertyDefinition = availablePropertyDefinitions[i];
-			
-			switch (filterType) {
-			case QUERYABLE_FILTER:
-				if (propertyDefinition.isQueryable())
-					selectablePropertyDefinition.add(propertyDefinition);
-				break;
-			case UPDATABLE_FILTER:
-				Updatability updatable = propertyDefinition.getUpdatability();
-				//Remove READONLY properties and ObjectTypeId
-				if (!propertyDefinition.getId().equals(PropertyIds.OBJECT_TYPE_ID)
-						&& !updatable.value().equals(Updatability.READONLY.value()))
-					selectablePropertyDefinition.add(propertyDefinition);
-				break;
-			default:
-				selectablePropertyDefinition.add(propertyDefinition);
-				break;
-			}
-		}
-		return selectablePropertyDefinition.toArray(new PropertyDefinition<?>[selectablePropertyDefinition.size()]);
-	}
-
 	/**
-	 * @param selectedObjectTypeNode
+	 * @param selectedTypeDefinitionModel
 	 *            the selected object type
 	 */
 	public void setSelectedObjectTypeNode(
-			CMISObjectTypeNode selectedObjectTypeNode) {
-		this.selectedObjectTypeNode = selectedObjectTypeNode;
+			TypeDefinitionModel selectedObjectTypeNode) {
+		this.selectedTypeDefinitionModel = selectedObjectTypeNode;
 		
 		PropertyDefinition<?>[] availablePropertyDefinitions = selectedObjectTypeNode.getPropertyDefinitions();
 		availablePropertyDefinitions = filterPropertyDefinitions(availablePropertyDefinitions);
@@ -159,10 +105,10 @@ public class CMISModelManager {
 	}
 	
 	/**
-	 * @return the selected object type
+	 * @return the selected TypeDefinition
 	 */
-	public CMISObjectTypeNode getSelectedObjectTypeNode() {
-		return selectedObjectTypeNode;
+	public TypeDefinitionModel getSelectedTypeDefinition() {
+		return selectedTypeDefinitionModel;
 	}
 
 	public void addSelectedPropertyDefinition(
@@ -188,9 +134,9 @@ public class CMISModelManager {
 	 * Clears the model
 	 */
 	public void clear() {
-		selectedObjectTypeNode = null;
+		selectedTypeDefinitionModel = null;
 		selectedPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>();
-		availableObjectTypeNodes = new ArrayList<CMISObjectTypeNode>();
+		availableTypeDefinitionModel = new ArrayList<TypeDefinitionModel>();
 	}
 
 	/**
@@ -200,16 +146,15 @@ public class CMISModelManager {
 	public void load() {
 		this.clear();
 
-		// load all the objectTypes from the CMIS server.
-		//TODO : optimiser en ne chargeant que les noeuds nécessaires !!
-		ItemIterable<ObjectType> availableObjectTypesIterable = cmisSessionManager.getSession()
+		// load all the TypeDefinition from the CMIS server.
+		ItemIterable<ObjectType> availableObjectTypesIterable = getSessionManager().getSession()
 				.getTypeChildren(null, true);
 
 		// Get the selected object type
-		String selectedObjectTypeId = (String) cmisComponent
+		String selectedTypeDefinition = (String) getCmisComponent()
 				.getElementParameter(PARAM_OBJECT_TYPE).getValue();
 
-		selectedObjectTypeId = selectedObjectTypeId.replaceAll("\"", "");
+		selectedTypeDefinition = selectedTypeDefinition.replaceAll("\"", "");
 
 		// Create a real model for the TreeViewer for a better management of the
 		// tree nodes
@@ -217,21 +162,21 @@ public class CMISModelManager {
 				.iterator(); iterator.hasNext();) {
 			ObjectType availableObjectType = (ObjectType) iterator.next();
 
-			CMISObjectTypeNode objectTypeNode = new CMISObjectTypeNode(null,
+			TypeDefinitionModel typeDefinition = new TypeDefinitionModel(null,
 					availableObjectType);
-			availableObjectTypeNodes.add(objectTypeNode);
+			getAvailableTypeDefinition().add(typeDefinition);
 
-			CMISObjectTypeNode foundObjectTypeNode = objectTypeNode
-					.findById(selectedObjectTypeId);
+			TypeDefinitionModel foundTypeDefinition = typeDefinition
+					.findById(selectedTypeDefinition);
 
-			if (foundObjectTypeNode != null)
-				setSelectedObjectTypeNode(foundObjectTypeNode);
+			if (foundTypeDefinition != null)
+				setSelectedObjectTypeNode(foundTypeDefinition);
 				
 		}
 		//Select the first node if any selected
-		if (getSelectedObjectTypeNode() == null)
+		if (getSelectedTypeDefinition() == null)
 		{
-			setSelectedObjectTypeNode(availableObjectTypeNodes.get(0));
+			setSelectedObjectTypeNode(getAvailableTypeDefinition().get(0));
 		}
 		
 		// Get the selected object properties
@@ -245,20 +190,17 @@ public class CMISModelManager {
 	public void save() {
 
 		cmisComponent.getElementParameter(PARAM_OBJECT_TYPE).setValue(
-				selectedObjectTypeNode.getObjectTypeId());
+				selectedTypeDefinitionModel.getObjectTypeId());
+
+		cmisComponent.getElementParameter(PARAM_OBJECT_TYPE_ID).setValue(
+				"\"" + selectedTypeDefinitionModel.getObjectTypeId() + "\"");
 
 		cmisComponent.getElementParameter(PARAM_BASE_TYPE_ID).setValue(
-				selectedObjectTypeNode.getBaseTypeId());
+				selectedTypeDefinitionModel.getBaseTypeId());
 
 		// Save the available metadatas;
 		this.saveMetadatas(PARAM_PROPERTY_MAPPING);
 
-		// Save the query
-		String componentName = (String) cmisComponent.getElementParameter("COMPONENT_NAME").getValue();
-		
-		if (componentName.endsWith(CMISComponent.INPUT_COMPONENT_SUFFIX))
-			this.saveQuery(PARAM_QUERY);
-		
 		cmisComponent.getElementParameter("UPDATE_COMPONENTS").setValue(
 				Boolean.TRUE);
 	}
@@ -286,26 +228,6 @@ public class CMISModelManager {
 		}
 	}
 
-	private void saveQuery(String paramQuery) {
-
-		Query query = new Query();
-		
-		String objectTypeId = selectedObjectTypeNode.getObjectTypeId();
-		Character alias = query.appendFrom(objectTypeId);
-		
-		HashMap<String, PropertyDefinition<?>> queryPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>(
-				selectedPropertyDefinitions);
-
-		for (PropertyDefinition<?> queryProperty : queryPropertyDefinitions.values()) {
-			String propertyId = queryProperty.getId();
-			
-			query.appendSelect(alias, propertyId);
-		}
-		
-		cmisComponent
-		.getElementParameter(paramQuery).setValue("\"" + query.getQueryStatement() + "\"");
-	}
-	
 	/**
 	 * Saves the given metadata to the given map
 	 * 
@@ -313,7 +235,7 @@ public class CMISModelManager {
 	 * @param objectTypeId
 	 */
 	@SuppressWarnings("unchecked")
-	protected void saveMetadatas(String metadataMappingParamName) {
+	private void saveMetadatas(String metadataMappingParamName) {
 		List<Map<String, String>> metadataMappingTable = (List<Map<String, String>>) cmisComponent
 				.getElementParameter(metadataMappingParamName).getValue();
 
@@ -381,20 +303,18 @@ public class CMISModelManager {
 	 * @param metadataMappingRow
 	 * @param propertyDef
 	 */
-	protected void fillPropertyMappingRow(
+	private void fillPropertyMappingRow(
 			Map<String, String> metadataMappingRow,
 			PropertyDefinition<?> propertyDef) {
-		// NB. reputting PARAM_ITEM_NAME is not required if the metadata with
-		// such a name already existed, but not a problem either
+
 		if (metadataMappingRow != null
 				&& propertyDef != null)
 		{
+			String objectTypeId = getSelectedTypeDefinition().getObjectTypeId();
+			metadataMappingRow.put(PARAM_OBJECT_TYPE_ID, objectTypeId );
 			metadataMappingRow.put(PARAM_ITEM_ID, propertyDef.getId());
-			metadataMappingRow.put(PARAM_ITEM_NAME, propertyDef.getDisplayName());
 			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType()
 					.value());
-			metadataMappingRow.put(PARAM_ITEM_MANDATORY, propertyDef.isRequired()
-					.toString());
 			List<?> defaultValue = propertyDef.getDefaultValue(); 
 			if (defaultValue != null)
 			{
@@ -402,7 +322,6 @@ public class CMISModelManager {
 			}
 		}
 	}
-
 	public CMISComponent getCmisComponent() {
 		return cmisComponent;
 	}

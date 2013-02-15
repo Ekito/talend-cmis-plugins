@@ -20,7 +20,7 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.talend.designer.cmis.CMISComponent;
 
-public class CMISSessionManager {
+public class SessionManager {
 	
 	
 	public static final String PARAM_CMIS_BINDING_TYPE = "CMIS_BINDING_TYPE";
@@ -35,7 +35,7 @@ public class CMISSessionManager {
 	private CMISComponent cmisComponent;
 	private Session session;
 
-	public CMISSessionManager(CMISComponent cmisComponent) {
+	public SessionManager(CMISComponent cmisComponent) {
 		this.cmisComponent = cmisComponent;
 		initSession(cmisComponent);
 		
