@@ -11,27 +11,28 @@
 package org.talend.designer.cmis.manager;
 
 import org.talend.core.model.process.IExternalNode;
+import org.talend.designer.cmis.manager.impl.CMISFolderManager;
 
 public class FunctionManager {
 
 	
 	private IExternalNode component;
 	private SessionManager sessionManager;
-	private FolderManager folderManager;
+	private CMISFolderManager cMISFolderManager;
 	
 	public FunctionManager(IExternalNode component,
 			SessionManager sessionManager) {
 		this.component = component;
 		this.sessionManager = sessionManager;
-		this.folderManager = new FolderManager(component, sessionManager);
+		this.cMISFolderManager = new CMISFolderManager(component, sessionManager);
 	}
 	
-	public FolderManager getFolderManager() {
-		return folderManager;
+	public CMISFolderManager getFolderManager() {
+		return cMISFolderManager;
 	}
 	
 	public void save() {
-		this.folderManager.save();
+		this.cMISFolderManager.save();
 		
 	}
 }

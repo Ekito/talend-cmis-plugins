@@ -13,6 +13,7 @@ Require-Bundle: org.talend.libraries.apache.chemistry,
  org.talend.core.runtime,
  org.talend.designer.core,
  org.talend.model,
- org.talend.sqlbuilder
+ org.talend.sqlbuilder,
+ org.talend.metadata.managment.ui;bundle-version="1.0.0"
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

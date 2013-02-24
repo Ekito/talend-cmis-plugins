@@ -16,7 +16,7 @@ import java.util.HashMap;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.query.Query;
+import org.talend.designer.cmis.model.Query;
 
 /**
  * This class holds the model and UI managers on behalf of the component.

@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.talend.designer.cmis.i18n.Messages;
-import org.talend.designer.cmis.manager.FolderManager;
+import org.talend.designer.cmis.manager.impl.CMISFolderManager;
 import org.talend.designer.cmis.model.FolderModel;
 
 /**
@@ -42,12 +42,12 @@ public class FolderDialog extends Dialog {
 
 	private String folderPath;
 
-	private FolderManager folderManager;
+	private CMISFolderManager cMISFolderManager;
 
-	public FolderDialog(Shell parentShell, FolderManager folderManager) {
+	public FolderDialog(Shell parentShell, CMISFolderManager cMISFolderManager) {
 		super(parentShell);
 		
-		this.folderManager = folderManager;
+		this.cMISFolderManager = cMISFolderManager;
 
 		setBlockOnOpen(false);
 		setShellStyle(SWT.APPLICATION_MODAL | SWT.BORDER | SWT.RESIZE | SWT.CLOSE | SWT.MIN | SWT.MAX | SWT.TITLE);
@@ -80,7 +80,7 @@ public class FolderDialog extends Dialog {
 		folderTreeViewer.setContentProvider(new FolderTreeContentProvider());
 		folderTreeViewer.setLabelProvider(new FolderLabelProvider());
 		
-		ArrayList<FolderModel> rootFolderNodes = folderManager.getRootFolderNodes();
+		ArrayList<FolderModel> rootFolderNodes = cMISFolderManager.getRootFolderNodes();
 //		ArrayList<CMISObjectTypeNode> treeInput = modelManager.getAvailableObjectTypeNodes();
 //		ArrayList<CMISFolderNode> folderList = new ArrayList<CMISFolderNode>();
 //		folderList.add(rootFolderNode);
@@ -96,7 +96,7 @@ public class FolderDialog extends Dialog {
 
 			public void widgetSelected(SelectionEvent e) {
 				FolderModel selectedData = (FolderModel) e.item.getData();
-				folderManager.setSelectedFolderPath(selectedData.getFolderPath());
+				cMISFolderManager.setSelectedFolderPath(selectedData.getFolderPath());
 
 			}
 

@@ -9,7 +9,7 @@
  *     jboulay - initial API and implementation
  ******************************************************************************/
 
-package org.talend.designer.cmis.manager;
+package org.talend.designer.cmis.manager.impl;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -22,6 +22,7 @@ import org.talend.core.model.process.EConnectionType;
 import org.talend.core.model.process.IConnection;
 import org.talend.designer.cmis.CMISComponent;
 import org.talend.designer.cmis.i18n.Messages;
+import org.talend.designer.cmis.manager.EditorManager;
 import org.talend.designer.cmis.ui.EditorDialog;
 
 /**
@@ -49,10 +50,17 @@ public class CMISComponentManager {
 	}
 
 	/**
-	 * @return the dialog for selecting the object type
+	 * @return the editor dialog
 	 */
 	public EditorDialog getEditorDialog() {
 		return editorDialog;
+	}
+
+	/**
+	 * @return the editor manager
+	 */
+	public EditorManager getEditorManager() {
+		return editorManager;
 	}
 
 	/**
@@ -86,24 +94,15 @@ public class CMISComponentManager {
 			}
 		}
 
-		// first load the model
-		try {
-			editorManager.getModelManager().load(); // NB. or when modelManager is created
-		} catch (Exception ex) {
-			ExceptionHandler.process(ex);
-			editorManager.getModelManager().clear();
-			return null;
-		}
-
 		// then create and open the model dialog :
-		EditorDialog cmisEditorDialog = new EditorDialog(
+		EditorDialog editorDialog = new EditorDialog(
 				parent.getShell(), editorManager);
 		
 		//Set Model, image and others...
-		cmisEditorDialog.open();
+		editorDialog.open();
 
 		// NB. this dialog is blocking ; model save is done in its okPressed()
-		return cmisEditorDialog;
+		return editorDialog;
 	}
 
 	/**

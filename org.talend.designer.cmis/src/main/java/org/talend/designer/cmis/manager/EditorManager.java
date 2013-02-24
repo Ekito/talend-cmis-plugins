@@ -11,6 +11,7 @@
 
 package org.talend.designer.cmis.manager;
 
+import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.CMISComponent;
 
@@ -36,7 +37,7 @@ public class EditorManager {
 		this.functionManager = new FunctionManager(component, sessionManager);
 	}
 	
-	public IExternalNode getCmisComponent() {
+	public IExternalNode getComponent() {
 		return component;
 	}
 	
@@ -50,6 +51,15 @@ public class EditorManager {
 	
 	public SessionManager getSessionManager() {
 		return sessionManager;
+	}
+	
+	public void createSession(IContext context) {
+		sessionManager.createSession(context);
+	}
+	
+	public void loadModel()
+	{
+		typeDefinitionManager.load();
 	}
 
 	public void save() {

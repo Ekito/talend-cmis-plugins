@@ -8,7 +8,7 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.query;
+package org.talend.designer.cmis.model;
 
 import java.util.HashMap;
 import java.util.Iterator;

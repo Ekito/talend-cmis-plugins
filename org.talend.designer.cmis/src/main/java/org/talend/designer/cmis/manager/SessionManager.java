@@ -18,7 +18,12 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
+import org.talend.core.model.process.IContext;
+import org.talend.core.model.process.IElement;
+import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.IExternalNode;
+import org.talend.core.model.utils.ContextParameterUtils;
+import org.talend.core.model.utils.TalendTextUtils;
 
 public class SessionManager {
 	
@@ -34,91 +39,133 @@ public class SessionManager {
 
 	private IExternalNode component;
 	private Session session;
-
+	private String bindingType;
+	private String atomPubURL;
+	private String webServicesURL;
+	private String username;
+	private String password;
+	private String repositoryId;
+	private String country;
+	private String language;
+	
+	protected boolean isContextDependant;
+	
 	public SessionManager(IExternalNode component) {
 		this.component = component;
-		initSession(component);
-		
+		init(component);
 	}
 
-	private void initSession(IExternalNode component) {
-		
-		String bindingType = (String) component.getElementParameter(
-				PARAM_CMIS_BINDING_TYPE).getValue();
-		bindingType = bindingType.replaceAll("\"", "");
+	private void init(IExternalNode cmisComponent) {
 
-		String atomPubURL = null;
-		String webServicesURL = null;
-		if (bindingType.equals(BindingType.ATOMPUB.value()))
-		{
-			atomPubURL = (String) component.getElementParameter(
-					PARAM_CMIS_ATOMPUB_URL).getValue();
-			atomPubURL = atomPubURL.replaceAll("\"", "");
-		} else if (bindingType.equals(BindingType.WEBSERVICES.value()))
-		{
-			webServicesURL = (String) component.getElementParameter(
-					PARAM_CMIS_WEBSERVICES_URL).getValue();
-			webServicesURL = webServicesURL.replaceAll("\"", "");
-		}
-		
-		String username = (String) component.getElementParameter(
-				PARAM_CMIS_USER_LOGIN).getValue();
-		username = username.replaceAll("\"", "");
-
-		String password = (String) component.getElementParameter(
-				PARAM_CMIS_USER_PASSWORD).getValue();
-		password = password.replaceAll("\"", "");
-
-		String repositoryId = (String) component.getElementParameter(
-				PARAM_CMIS_REPOSITORY).getValue();
-		repositoryId = repositoryId.replaceAll("\"", "");
-
-		String country = (String) component.getElementParameter(
-				PARAM_COUNTRY_CONNECTION).getValue();
-		country = country.replaceAll("\"", "");
-
-		String language = (String) component.getElementParameter(
-				PARAM_LANGUAGE_CONNECTION).getValue();
-		language = language.replaceAll("\"", "");
-
-		SessionFactory f = SessionFactoryImpl.newInstance();
-		Map<String, String> parameter = new HashMap<String, String>();
-
-		// user credentials
-		parameter.put(SessionParameter.USER, username);
-		parameter.put(SessionParameter.PASSWORD, password);
-
-		// connection settings
-		if (bindingType.equals(BindingType.ATOMPUB.value()))
-		{
-			parameter.put(SessionParameter.ATOMPUB_URL, atomPubURL);
-			parameter.put(SessionParameter.BINDING_TYPE, bindingType);
-
-		} else if (bindingType.equals(BindingType.WEBSERVICES.value()))
-		{
-			parameter.put(SessionParameter.BINDING_TYPE, BindingType.WEBSERVICES.value());
-			parameter.put(SessionParameter.WEBSERVICES_ACL_SERVICE, webServicesURL + "/ACLService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE, webServicesURL + "/DiscoveryService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE, webServicesURL + "/MultiFilingService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE, webServicesURL + "/NavigationService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE, webServicesURL + "/ObjectService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_POLICY_SERVICE, webServicesURL + "/PolicyService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE, webServicesURL + "/RelationshipService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE, webServicesURL + "/RepositoryService?wsdl");
-			parameter.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE, webServicesURL + "/VersioningService?wsdl");
-		}
-		
-		parameter.put(SessionParameter.REPOSITORY_ID, repositoryId);
-
-		// session locale
-		parameter.put(SessionParameter.LOCALE_ISO3166_COUNTRY, country);
-		parameter.put(SessionParameter.LOCALE_ISO639_LANGUAGE, language);
-
-		// create session
-		this.session = f.createSession(parameter);		
+		bindingType = loadParameterValue(cmisComponent, PARAM_CMIS_BINDING_TYPE);
+		atomPubURL = loadParameterValue(cmisComponent, PARAM_CMIS_ATOMPUB_URL);
+		webServicesURL = loadParameterValue(cmisComponent, PARAM_CMIS_WEBSERVICES_URL);
+		username = loadParameterValue(cmisComponent, PARAM_CMIS_USER_LOGIN);
+		password = loadParameterValue(cmisComponent, PARAM_CMIS_USER_PASSWORD);
+		repositoryId = loadParameterValue(cmisComponent, PARAM_CMIS_REPOSITORY);
+		country = loadParameterValue(cmisComponent, PARAM_COUNTRY_CONNECTION);
+		language = loadParameterValue(cmisComponent, PARAM_LANGUAGE_CONNECTION);
 	}
 	
+	public Map<String, String> getSessionParameters(IContext context) {
+
+		IContext selectedContext = null;
+
+		if (context != null)
+		{
+			selectedContext = context;
+		}
+		else if (isContextDependant)
+		{
+			selectedContext = component.getProcess().getContextManager().getDefaultContext();
+		}
+
+		Map<String, String> resolvedSessionParameters = new HashMap<String, String>();
+
+		resolvedSessionParameters = new HashMap<String, String>();
+
+		// user credentials
+		resolvedSessionParameters.put(SessionParameter.USER,
+				parseScriptContextCode(username, selectedContext));
+		resolvedSessionParameters.put(SessionParameter.PASSWORD,
+				parseScriptContextCode(password, selectedContext));
+
+		// connection settings
+		String resolvedBindingType = parseScriptContextCode(bindingType, selectedContext);
+
+		resolvedSessionParameters.put(SessionParameter.BINDING_TYPE, resolvedBindingType);
+
+		if (resolvedBindingType.equals(BindingType.ATOMPUB.value()))
+		{
+			resolvedSessionParameters.put(SessionParameter.ATOMPUB_URL,
+					parseScriptContextCode(atomPubURL, selectedContext));
+
+		} else if (resolvedBindingType.equals(BindingType.WEBSERVICES.value()))
+		{
+			String resolvedWSUrl = parseScriptContextCode(webServicesURL, selectedContext);
+
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_ACL_SERVICE, resolvedWSUrl + "/ACLService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE, resolvedWSUrl + "/DiscoveryService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE, resolvedWSUrl + "/MultiFilingService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE, resolvedWSUrl + "/NavigationService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE, resolvedWSUrl + "/ObjectService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_POLICY_SERVICE, resolvedWSUrl + "/PolicyService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE, resolvedWSUrl + "/RelationshipService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE, resolvedWSUrl + "/RepositoryService?wsdl");
+			resolvedSessionParameters.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE, resolvedWSUrl + "/VersioningService?wsdl");
+		}
+
+		resolvedSessionParameters.put(SessionParameter.REPOSITORY_ID,
+				parseScriptContextCode(repositoryId, selectedContext));
+
+		// session locale
+		resolvedSessionParameters.put(SessionParameter.LOCALE_ISO3166_COUNTRY,
+				parseScriptContextCode(country, selectedContext));
+		resolvedSessionParameters.put(SessionParameter.LOCALE_ISO639_LANGUAGE,
+				parseScriptContextCode(language, selectedContext));
+
+		return resolvedSessionParameters;
+	}
+	
+	public boolean isContextDependant()
+	{
+		return isContextDependant;
+	}
+	
+	protected String loadParameterValue(IElement elem, String key)
+	{
+		if (elem == null || key == null) {
+			return "";
+		}
+
+		IElementParameter elemParam = elem.getElementParameter(key);
+		if (elemParam != null) {
+			Object value = elemParam.getValue();
+
+			if (value instanceof String) {
+				if (ContextParameterUtils.isContainContextParam((String)value))
+				{
+					isContextDependant = true;
+				}
+				return (String) value;
+			}
+		}
+		return "";
+	}
+	
+	protected String parseScriptContextCode(String code, IContext context)
+	{
+		code = ContextParameterUtils.parseScriptContextCode(code, context);
+		return TalendTextUtils.removeQuotes(code);
+	}
+
 	public Session getSession() {
 		return session;
+	}
+	
+	public void createSession(IContext context) {
+		Map<String, String> parameters = getSessionParameters(context);
+		SessionFactory f = SessionFactoryImpl.newInstance();
+		session = f.createSession(parameters);
 	}
 }

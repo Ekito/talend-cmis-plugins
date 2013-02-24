@@ -8,7 +8,7 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.manager;
+package org.talend.designer.cmis.manager.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +17,17 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
 import org.talend.core.model.process.IExternalNode;
+import org.talend.designer.cmis.manager.SessionManager;
 import org.talend.designer.cmis.model.FolderModel;
 
-public class FolderManager {
+public class CMISFolderManager {
 	
 	private IExternalNode component;
 	private SessionManager sessionManager;
 	private ArrayList<FolderModel> rootFolderNodes;
 	private String selectedFolderPath;
 
-	public FolderManager(IExternalNode component,
+	public CMISFolderManager(IExternalNode component,
 			SessionManager sessionManager) {
 		this.component = component;
 		this.sessionManager = sessionManager;

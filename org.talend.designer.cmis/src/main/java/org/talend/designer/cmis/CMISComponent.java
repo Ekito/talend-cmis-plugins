@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -30,11 +31,13 @@ import org.talend.core.GlobalServiceRegister;
 import org.talend.core.model.components.IODataComponent;
 import org.talend.core.model.process.AbstractExternalNode;
 import org.talend.core.model.process.IComponentDocumentation;
+import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IExternalData;
 import org.talend.core.model.temp.ECodePart;
-import org.talend.designer.cmis.manager.CMISComponentManager;
 import org.talend.designer.cmis.manager.TypeDefinitionManager;
+import org.talend.designer.cmis.manager.impl.CMISComponentManager;
 import org.talend.designer.codegen.ICodeGeneratorService;
+import org.talend.repository.ui.wizards.metadata.ContextSetsSelectionDialog;
 
 /**
  * Component class of tCMISOutput
@@ -119,13 +122,43 @@ public class CMISComponent extends AbstractExternalNode {
 	 */
 	public int open(Display display) {
 
-		final CMISComponent thisComponent = this;
+		cmisManager = new CMISComponentManager(this);
+		
+		boolean isContextDependant = cmisManager.getEditorManager().getSessionManager().isContextDependant();
+		
+		//Select the execution context if necessary
+		IContext selectedContext = null;
+		
+		if (isContextDependant) {
+			List<IContext> contextList = getProcess().getContextManager().getListContext();
+			
+			if (contextList.size() > 1) {
+				ContextSetsSelectionDialog setsDialog = new ContextSetsSelectionDialog(null, getProcess().getContextManager(), false);
+				setsDialog.open();
+				String selectedContextString = setsDialog.getSelectedContext();
+				selectedContext = getProcess().getContextManager().getContext(selectedContextString);
+			}else
+			{
+				selectedContext = getProcess().getContextManager().getDefaultContext();
+			}
+			
+		}
+		
+		final IContext theSelectedContext = selectedContext;
+		
     	ProgressDialog progressDialog = new ProgressDialog(display.getActiveShell()) {
 
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-            	cmisManager = new CMISComponentManager(thisComponent);
+            	try {
+            		//Create the CMIS session
+            		cmisManager.getEditorManager().createSession(theSelectedContext);
+            		//Load the model
+        			cmisManager.getEditorManager().loadModel(); // NB. or when modelManager is created
+        		} catch (Exception ex) {
+        			ExceptionHandler.process(ex);
+        			cmisManager.getEditorManager().getModelManager().clear();
+        		}
             }
         };
 

@@ -81,7 +81,7 @@ public class EditorDialog extends Dialog {
 		
 		createCMISTypesArea(sash);
 
-		String componentName = editorManager.getCmisComponent().getComponent().getName();
+		String componentName = editorManager.getComponent().getComponent().getName();
 		//if componentName like '*Input' display query editor
 //		if (componentName.endsWith("Input"))
 //		{
@@ -155,10 +155,10 @@ public class EditorDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		IComponent component = editorManager.getCmisComponent().getComponent();
+		IComponent component = editorManager.getComponent().getComponent();
 		Image createImage = CoreImageProvider.getComponentIcon(component, ICON_SIZE.ICON_32);
 		newShell.setImage(createImage);
-		newShell.setText(editorManager.getCmisComponent().getUniqueName());
+		newShell.setText(editorManager.getComponent().getUniqueName());
 		newShell.setSize(900, 600);
 	}
 
