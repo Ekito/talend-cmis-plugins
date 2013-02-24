@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
-import org.talend.designer.cmis.CMISComponent;
+import org.talend.core.model.process.IExternalNode;
 
 /**
  * This class holds the model and UI managers on behalf of the component.
@@ -25,7 +25,7 @@ import org.talend.designer.cmis.CMISComponent;
  */
 public class OutputTypeDefinitionManager extends TypeDefinitionManager{
 
-	public OutputTypeDefinitionManager(CMISComponent cmisComponent, SessionManager sessionManager) {
+	public OutputTypeDefinitionManager(IExternalNode cmisComponent, SessionManager sessionManager) {
 		super(cmisComponent, sessionManager);
 	}
 

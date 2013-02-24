@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.CMISComponent;
 import org.talend.designer.cmis.query.Query;
 
@@ -27,7 +28,7 @@ public class InputTypeDefinitionManager extends TypeDefinitionManager {
 
 	public static final String PARAM_QUERY = "QUERY";
 
-	public InputTypeDefinitionManager(CMISComponent cmisComponent, SessionManager sessionManager) {
+	public InputTypeDefinitionManager(IExternalNode cmisComponent, SessionManager sessionManager) {
 		super(cmisComponent, sessionManager);
 	}
 
@@ -55,7 +56,7 @@ public class InputTypeDefinitionManager extends TypeDefinitionManager {
 
 		this.saveQuery(PARAM_QUERY);
 
-		getCmisComponent().getElementParameter("UPDATE_COMPONENTS").setValue(
+		getComponent().getElementParameter("UPDATE_COMPONENTS").setValue(
 				Boolean.TRUE);
 	}
 
@@ -75,7 +76,7 @@ public class InputTypeDefinitionManager extends TypeDefinitionManager {
 			query.appendSelect(alias, propertyId);
 		}
 
-		getCmisComponent()
+		getComponent()
 		.getElementParameter(paramQuery).setValue("\"" + query.getQueryStatement() + "\"");
 	}
 

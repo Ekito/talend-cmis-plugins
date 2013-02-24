@@ -11,6 +11,7 @@
 
 package org.talend.designer.cmis.manager;
 
+import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.CMISComponent;
 
 public class EditorManager {
@@ -18,13 +19,13 @@ public class EditorManager {
 	private SessionManager sessionManager;
 	private TypeDefinitionManager typeDefinitionManager;
 	private FunctionManager functionManager;
-	private CMISComponent cmisComponent;
+	private IExternalNode component;
 
-	public EditorManager(CMISComponent component) {
-		this.cmisComponent = component;
+	public EditorManager(IExternalNode component) {
+		this.component = component;
 		this.sessionManager = new SessionManager(component);
 		
-		String componentName = (String) cmisComponent.getElementParameter("COMPONENT_NAME").getValue();
+		String componentName = (String) component.getElementParameter("COMPONENT_NAME").getValue();
 		
 		if (componentName.endsWith(CMISComponent.INPUT_COMPONENT_SUFFIX)) {
 			this.typeDefinitionManager = new InputTypeDefinitionManager(component, sessionManager);
@@ -35,8 +36,8 @@ public class EditorManager {
 		this.functionManager = new FunctionManager(component, sessionManager);
 	}
 	
-	public CMISComponent getCmisComponent() {
-		return cmisComponent;
+	public IExternalNode getCmisComponent() {
+		return component;
 	}
 	
 	public FunctionManager getFunctionManager() {

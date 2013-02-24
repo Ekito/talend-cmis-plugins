@@ -150,7 +150,7 @@ public class CMISComponent extends AbstractExternalNode {
         }
 
 		
-		int returnCode = cmisManager.getCMISModelDialog() != null ? cmisManager.getCMISModelDialog().getReturnCode() : Dialog.CANCEL;
+		int returnCode = cmisManager.getEditorDialog() != null ? cmisManager.getEditorDialog().getReturnCode() : Dialog.CANCEL;
 		
 		return returnCode;
 	}

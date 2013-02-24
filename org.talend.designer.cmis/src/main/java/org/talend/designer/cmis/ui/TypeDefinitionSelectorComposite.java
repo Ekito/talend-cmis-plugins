@@ -166,7 +166,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
 			
 			//If the property is required and it's an output component,
 			//then it is automatically added to the selected properties
-			String componentName = (String) modelManager.getCmisComponent()
+			String componentName = (String) modelManager.getComponent()
 					.getElementParameter("COMPONENT_NAME").getValue();
 			
 			if (componentName.endsWith(CMISComponent.OUTPUT_COMPONENT_SUFFIX)
@@ -187,7 +187,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
 					modelManager.addSelectedPropertyDefinition(propertyDefinition);
 				}else
 				{
-					String componentName = (String) modelManager.getCmisComponent()
+					String componentName = (String) modelManager.getComponent()
 							.getElementParameter("COMPONENT_NAME").getValue();
 					
 					if (componentName.endsWith(CMISComponent.OUTPUT_COMPONENT_SUFFIX)

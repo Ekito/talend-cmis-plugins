@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
-import org.talend.designer.cmis.CMISComponent;
+import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 /**
@@ -74,6 +74,6 @@ public interface ITypeDefinitionManager {
 	 */
 	public void save();
 	
-	public CMISComponent getCmisComponent();
+	public IExternalNode getComponent();
 
 }

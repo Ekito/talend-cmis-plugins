@@ -21,7 +21,7 @@ import java.util.Map;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
-import org.talend.designer.cmis.CMISComponent;
+import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 /**
@@ -47,7 +47,7 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 
 	public static final String PARAM_ITEM_DEFAULT = "DEFAULT";
 
-	private CMISComponent cmisComponent;
+	private IExternalNode component;
 	
 	private SessionManager sessionManager;
 
@@ -63,8 +63,8 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 	private TypeDefinitionModel selectedTypeDefinitionModel;
 	private Map<String, PropertyDefinition<?>> selectedPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>();
 
-	public TypeDefinitionManager(CMISComponent cmisComponent, SessionManager sessionManager) {
-		this.cmisComponent = cmisComponent;
+	public TypeDefinitionManager(IExternalNode component, SessionManager sessionManager) {
+		this.component = component;
 		this.sessionManager = sessionManager;
 	}
 
@@ -152,7 +152,7 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 				.getTypeChildren(null, true);
 
 		// Get the selected object type
-		String selectedTypeDefinition = (String) getCmisComponent()
+		String selectedTypeDefinition = (String) getComponent()
 				.getElementParameter(PARAM_OBJECT_TYPE).getValue();
 
 		selectedTypeDefinition = selectedTypeDefinition.replaceAll("\"", "");
@@ -190,19 +190,19 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 	 */
 	public void save() {
 
-		cmisComponent.getElementParameter(PARAM_OBJECT_TYPE).setValue(
+		component.getElementParameter(PARAM_OBJECT_TYPE).setValue(
 				selectedTypeDefinitionModel.getObjectTypeId());
 
-		cmisComponent.getElementParameter(PARAM_OBJECT_TYPE_ID).setValue(
+		component.getElementParameter(PARAM_OBJECT_TYPE_ID).setValue(
 				"\"" + selectedTypeDefinitionModel.getObjectTypeId() + "\"");
 
-		cmisComponent.getElementParameter(PARAM_BASE_TYPE_ID).setValue(
+		component.getElementParameter(PARAM_BASE_TYPE_ID).setValue(
 				selectedTypeDefinitionModel.getBaseTypeId());
 
 		// Save the available metadatas;
 		this.saveMetadatas(PARAM_PROPERTY_MAPPING);
 
-		cmisComponent.getElementParameter("UPDATE_COMPONENTS").setValue(
+		component.getElementParameter("UPDATE_COMPONENTS").setValue(
 				Boolean.TRUE);
 	}
 
@@ -214,7 +214,7 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 	@SuppressWarnings("unchecked")
 	private void loadMetadatas(String metadataMappingParamName) {
 
-		List<Map<String, String>> metadataMappingTable = (List<Map<String, String>>) cmisComponent
+		List<Map<String, String>> metadataMappingTable = (List<Map<String, String>>) component
 				.getElementParameter(metadataMappingParamName).getValue();
 
 		HashMap<String, PropertyDefinition<?>> propertyDefinitionMap = getAvailablePropertyDefinitionsMap();
@@ -237,7 +237,7 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 	 */
 	@SuppressWarnings("unchecked")
 	private void saveMetadatas(String metadataMappingParamName) {
-		List<Map<String, String>> metadataMappingTable = (List<Map<String, String>>) cmisComponent
+		List<Map<String, String>> metadataMappingTable = (List<Map<String, String>>) component
 				.getElementParameter(metadataMappingParamName).getValue();
 
 		HashMap<String, PropertyDefinition<?>> remainingPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>(
@@ -323,8 +323,8 @@ public abstract class TypeDefinitionManager implements ITypeDefinitionManager{
 			}
 		}
 	}
-	public CMISComponent getCmisComponent() {
-		return cmisComponent;
+	public IExternalNode getComponent() {
+		return component;
 	}
 
 }

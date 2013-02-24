@@ -18,7 +18,7 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
-import org.talend.designer.cmis.CMISComponent;
+import org.talend.core.model.process.IExternalNode;
 
 public class SessionManager {
 	
@@ -32,18 +32,18 @@ public class SessionManager {
 	public static final String PARAM_COUNTRY_CONNECTION = "COUNTRY_CONNECTION";
 	public static final String PARAM_LANGUAGE_CONNECTION = "LANGUAGE_CONNECTION";
 
-	private CMISComponent cmisComponent;
+	private IExternalNode component;
 	private Session session;
 
-	public SessionManager(CMISComponent cmisComponent) {
-		this.cmisComponent = cmisComponent;
-		initSession(cmisComponent);
+	public SessionManager(IExternalNode component) {
+		this.component = component;
+		initSession(component);
 		
 	}
 
-	private void initSession(CMISComponent cmisComponent2) {
+	private void initSession(IExternalNode component) {
 		
-		String bindingType = (String) cmisComponent.getElementParameter(
+		String bindingType = (String) component.getElementParameter(
 				PARAM_CMIS_BINDING_TYPE).getValue();
 		bindingType = bindingType.replaceAll("\"", "");
 
@@ -51,33 +51,33 @@ public class SessionManager {
 		String webServicesURL = null;
 		if (bindingType.equals(BindingType.ATOMPUB.value()))
 		{
-			atomPubURL = (String) cmisComponent.getElementParameter(
+			atomPubURL = (String) component.getElementParameter(
 					PARAM_CMIS_ATOMPUB_URL).getValue();
 			atomPubURL = atomPubURL.replaceAll("\"", "");
 		} else if (bindingType.equals(BindingType.WEBSERVICES.value()))
 		{
-			webServicesURL = (String) cmisComponent.getElementParameter(
+			webServicesURL = (String) component.getElementParameter(
 					PARAM_CMIS_WEBSERVICES_URL).getValue();
 			webServicesURL = webServicesURL.replaceAll("\"", "");
 		}
 		
-		String username = (String) cmisComponent.getElementParameter(
+		String username = (String) component.getElementParameter(
 				PARAM_CMIS_USER_LOGIN).getValue();
 		username = username.replaceAll("\"", "");
 
-		String password = (String) cmisComponent.getElementParameter(
+		String password = (String) component.getElementParameter(
 				PARAM_CMIS_USER_PASSWORD).getValue();
 		password = password.replaceAll("\"", "");
 
-		String repositoryId = (String) cmisComponent.getElementParameter(
+		String repositoryId = (String) component.getElementParameter(
 				PARAM_CMIS_REPOSITORY).getValue();
 		repositoryId = repositoryId.replaceAll("\"", "");
 
-		String country = (String) cmisComponent.getElementParameter(
+		String country = (String) component.getElementParameter(
 				PARAM_COUNTRY_CONNECTION).getValue();
 		country = country.replaceAll("\"", "");
 
-		String language = (String) cmisComponent.getElementParameter(
+		String language = (String) component.getElementParameter(
 				PARAM_LANGUAGE_CONNECTION).getValue();
 		language = language.replaceAll("\"", "");
 

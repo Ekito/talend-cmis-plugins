@@ -33,7 +33,7 @@ import org.talend.designer.cmis.ui.EditorDialog;
 public class CMISComponentManager {
 
 	private CMISComponent cmisComponent;
-	private EditorDialog cmisEditorDialog;
+	private EditorDialog editorDialog;
 	private EditorManager editorManager;
 
 	public CMISComponentManager(CMISComponent cmisComponent) {
@@ -51,8 +51,8 @@ public class CMISComponentManager {
 	/**
 	 * @return the dialog for selecting the object type
 	 */
-	public EditorDialog getCMISModelDialog() {
-		return cmisEditorDialog;
+	public EditorDialog getEditorDialog() {
+		return editorDialog;
 	}
 
 	/**
@@ -113,8 +113,8 @@ public class CMISComponentManager {
 	 * @return
 	 */
 	public Shell createUI(Display display) {
-		this.cmisEditorDialog = createUI(display.getActiveShell());
-		return this.cmisEditorDialog != null ? this.cmisEditorDialog.getShell()
+		this.editorDialog = createUI(display.getActiveShell());
+		return this.editorDialog != null ? this.editorDialog.getShell()
 				: null;
 	}
 

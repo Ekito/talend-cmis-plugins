@@ -16,19 +16,19 @@ import java.util.List;
 import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
-import org.talend.designer.cmis.CMISComponent;
+import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.model.FolderModel;
 
 public class FolderManager {
 	
-	private CMISComponent cmisComponent;
+	private IExternalNode component;
 	private SessionManager sessionManager;
 	private ArrayList<FolderModel> rootFolderNodes;
 	private String selectedFolderPath;
 
-	public FolderManager(CMISComponent component,
+	public FolderManager(IExternalNode component,
 			SessionManager sessionManager) {
-		this.cmisComponent = component;
+		this.component = component;
 		this.sessionManager = sessionManager;
 	}
 	
