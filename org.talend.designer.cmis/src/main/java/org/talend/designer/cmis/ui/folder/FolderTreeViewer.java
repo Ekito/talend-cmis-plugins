@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
-import org.talend.designer.cmis.data.FolderModel;
+import org.talend.designer.cmis.model.FolderModel;
 
 public class FolderTreeViewer extends TreeViewer {
 

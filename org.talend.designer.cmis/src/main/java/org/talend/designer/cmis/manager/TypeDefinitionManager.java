@@ -8,7 +8,7 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.data;
+package org.talend.designer.cmis.manager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +22,7 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.talend.designer.cmis.CMISComponent;
+import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 /**
  * This class holds the model and UI managers on behalf of the component.

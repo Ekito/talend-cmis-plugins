@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.talend.designer.cmis.data.FunctionManager;
 import org.talend.designer.cmis.i18n.Messages;
+import org.talend.designer.cmis.manager.FunctionManager;
 import org.talend.designer.cmis.ui.folder.FolderDialog;
 
 public class FunctionEditorComposite extends Composite {

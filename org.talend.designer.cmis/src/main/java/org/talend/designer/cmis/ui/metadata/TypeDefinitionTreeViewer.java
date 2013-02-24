@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.talend.designer.cmis.data.TypeDefinitionModel;
+import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 public class TypeDefinitionTreeViewer extends TreeViewer {
 

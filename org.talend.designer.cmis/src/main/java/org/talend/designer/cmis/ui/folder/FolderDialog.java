@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.talend.designer.cmis.data.FolderManager;
-import org.talend.designer.cmis.data.FolderModel;
 import org.talend.designer.cmis.i18n.Messages;
+import org.talend.designer.cmis.manager.FolderManager;
+import org.talend.designer.cmis.model.FolderModel;
 
 /**
  * Dialog allowing to choose typing, i.e. an CMIS base type and CMIS object type within CMIS model definitions.

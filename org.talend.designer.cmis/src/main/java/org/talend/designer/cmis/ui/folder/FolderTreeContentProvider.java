@@ -16,7 +16,7 @@ import java.util.Comparator;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.talend.designer.cmis.data.FolderModel;
+import org.talend.designer.cmis.model.FolderModel;
 
 /**
  * Provide the content of a tree that displays the object type list.

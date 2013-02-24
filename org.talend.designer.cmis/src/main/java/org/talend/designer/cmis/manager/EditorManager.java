@@ -9,7 +9,7 @@
  *     jboulay - initial API and implementation
  ******************************************************************************/
 
-package org.talend.designer.cmis.data;
+package org.talend.designer.cmis.manager;
 
 import org.talend.designer.cmis.CMISComponent;
 

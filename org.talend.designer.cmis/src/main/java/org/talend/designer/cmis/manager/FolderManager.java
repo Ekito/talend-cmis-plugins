@@ -8,7 +8,7 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.data;
+package org.talend.designer.cmis.manager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
 import org.talend.designer.cmis.CMISComponent;
+import org.talend.designer.cmis.model.FolderModel;
 
 public class FolderManager {
 	

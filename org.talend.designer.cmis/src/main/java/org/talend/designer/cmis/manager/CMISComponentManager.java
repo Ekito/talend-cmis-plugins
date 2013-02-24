@@ -9,7 +9,7 @@
  *     jboulay - initial API and implementation
  ******************************************************************************/
 
-package org.talend.designer.cmis.controller;
+package org.talend.designer.cmis.manager;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -21,7 +21,6 @@ import org.talend.core.model.process.AbstractNode;
 import org.talend.core.model.process.EConnectionType;
 import org.talend.core.model.process.IConnection;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.EditorManager;
 import org.talend.designer.cmis.i18n.Messages;
 import org.talend.designer.cmis.ui.EditorDialog;
 
@@ -31,13 +30,13 @@ import org.talend.designer.cmis.ui.EditorDialog;
  * @author Julien Boulay - Ekito - www.ekito.fr
  * 
  */
-public class EditorController {
+public class CMISComponentManager {
 
 	private CMISComponent cmisComponent;
 	private EditorDialog cmisEditorDialog;
 	private EditorManager editorManager;
 
-	public EditorController(CMISComponent cmisComponent) {
+	public CMISComponentManager(CMISComponent cmisComponent) {
 		this.cmisComponent = cmisComponent;
 		this.editorManager = new EditorManager(cmisComponent);
 	}

@@ -8,7 +8,7 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.data;
+package org.talend.designer.cmis.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;

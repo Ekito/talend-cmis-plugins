@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.talend.designer.cmis.CMISComponent;
-import org.talend.designer.cmis.data.FolderModel;
+import org.talend.designer.cmis.model.FolderModel;
 
 /**
  * A label provider that display the icon and name of the object type.

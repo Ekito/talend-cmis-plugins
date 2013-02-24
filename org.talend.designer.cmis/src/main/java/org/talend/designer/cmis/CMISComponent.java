@@ -32,8 +32,8 @@ import org.talend.core.model.process.AbstractExternalNode;
 import org.talend.core.model.process.IComponentDocumentation;
 import org.talend.core.model.process.IExternalData;
 import org.talend.core.model.temp.ECodePart;
-import org.talend.designer.cmis.controller.EditorController;
-import org.talend.designer.cmis.data.TypeDefinitionManager;
+import org.talend.designer.cmis.manager.CMISComponentManager;
+import org.talend.designer.cmis.manager.TypeDefinitionManager;
 import org.talend.designer.codegen.ICodeGeneratorService;
 
 /**
@@ -51,7 +51,7 @@ public class CMISComponent extends AbstractExternalNode {
 
 	private TypeDefinitionManager modelManager; // created on open()
 
-	private EditorController cmisManager;
+	private CMISComponentManager cmisManager;
 
 	public CMISComponent() {
 		super();
@@ -125,7 +125,7 @@ public class CMISComponent extends AbstractExternalNode {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            	cmisManager = new EditorController(thisComponent);
+            	cmisManager = new CMISComponentManager(thisComponent);
             }
         };
 

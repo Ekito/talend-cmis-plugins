@@ -32,9 +32,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.talend.commons.ui.runtime.image.ImageUtils.ICON_SIZE;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.ui.images.CoreImageProvider;
-import org.talend.designer.cmis.data.EditorManager;
-import org.talend.designer.cmis.data.TypeDefinitionManager;
-import org.talend.designer.cmis.data.TypeDefinitionModel;
+import org.talend.designer.cmis.manager.EditorManager;
+import org.talend.designer.cmis.manager.TypeDefinitionManager;
+import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 /**
  * Dialog allowing to choose typing, i.e. a CMIS base type and CMIS object type within CMIS model definitions.
