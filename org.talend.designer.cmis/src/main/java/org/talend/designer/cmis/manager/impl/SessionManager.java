@@ -8,11 +8,17 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.manager;
+package org.talend.designer.cmis.manager.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.chemistry.opencmis.client.api.Folder;
+import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -24,10 +30,11 @@ import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.IExternalNode;
 import org.talend.core.model.utils.ContextParameterUtils;
 import org.talend.core.model.utils.TalendTextUtils;
+import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 public class SessionManager {
-	
-	
+
+
 	public static final String PARAM_CMIS_BINDING_TYPE = "CMIS_BINDING_TYPE";
 	public static final String PARAM_CMIS_ATOMPUB_URL = "CMIS_ATOMPUB_URL";
 	public static final String PARAM_CMIS_WEBSERVICES_URL = "CMIS_WEBSERVICES_URL";
@@ -49,7 +56,8 @@ public class SessionManager {
 	private String language;
 	
 	protected boolean isContextDependant;
-	
+	private ArrayList<TypeDefinitionModel> typeDefinitionModels;
+
 	public SessionManager(IExternalNode component) {
 		this.component = component;
 		init(component);
@@ -66,7 +74,7 @@ public class SessionManager {
 		country = loadParameterValue(cmisComponent, PARAM_COUNTRY_CONNECTION);
 		language = loadParameterValue(cmisComponent, PARAM_LANGUAGE_CONNECTION);
 	}
-	
+
 	public Map<String, String> getSessionParameters(IContext context) {
 
 		IContext selectedContext = null;
@@ -126,13 +134,13 @@ public class SessionManager {
 
 		return resolvedSessionParameters;
 	}
-	
+
 	public boolean isContextDependant()
 	{
 		return isContextDependant;
 	}
-	
-	protected String loadParameterValue(IElement elem, String key)
+
+	private String loadParameterValue(IElement elem, String key)
 	{
 		if (elem == null || key == null) {
 			return "";
@@ -152,20 +160,40 @@ public class SessionManager {
 		}
 		return "";
 	}
-	
-	protected String parseScriptContextCode(String code, IContext context)
+
+	private String parseScriptContextCode(String code, IContext context)
 	{
 		code = ContextParameterUtils.parseScriptContextCode(code, context);
 		return TalendTextUtils.removeQuotes(code);
 	}
 
-	public Session getSession() {
-		return session;
-	}
-	
 	public void createSession(IContext context) {
 		Map<String, String> parameters = getSessionParameters(context);
 		SessionFactory f = SessionFactoryImpl.newInstance();
 		session = f.createSession(parameters);
+	}
+
+	public List<TypeDefinitionModel> getTypeDefinitionModels()
+	{
+		if (typeDefinitionModels == null)
+		{
+			typeDefinitionModels = new ArrayList<TypeDefinitionModel>();
+			// load all the TypeDefinition from the CMIS server.
+			ItemIterable<ObjectType> availableObjectTypesIterable = session.getTypeChildren(null, true);
+
+			for (Iterator<ObjectType> iterator = availableObjectTypesIterable
+					.iterator(); iterator.hasNext();) {
+				ObjectType objectType = (ObjectType) iterator.next();
+
+				TypeDefinitionModel typeDefinitionModel = new TypeDefinitionModel(null, objectType);
+				
+				typeDefinitionModels.add(typeDefinitionModel);
+			}
+		}
+		return typeDefinitionModels;
+	}
+	
+	public Folder getRootFolder() {
+		return session.getRootFolder();
 	}
 }

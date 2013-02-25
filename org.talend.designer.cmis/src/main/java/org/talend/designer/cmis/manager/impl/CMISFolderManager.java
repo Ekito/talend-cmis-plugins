@@ -17,7 +17,6 @@ import org.apache.chemistry.opencmis.client.api.FileableCmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Tree;
 import org.talend.core.model.process.IExternalNode;
-import org.talend.designer.cmis.manager.SessionManager;
 import org.talend.designer.cmis.model.FolderModel;
 
 public class CMISFolderManager {
@@ -39,7 +38,7 @@ public class CMISFolderManager {
 		if (rootFolderNodes == null)
 		{
 			rootFolderNodes = new ArrayList<FolderModel>();
-			Folder rootFolder = sessionManager.getSession().getRootFolder();
+			Folder rootFolder = sessionManager.getRootFolder();
 			List<Tree<FileableCmisObject>> childFolders = rootFolder.getFolderTree(1);
 			
 			FolderModel rootFolderNode = new FolderModel(null, rootFolder);

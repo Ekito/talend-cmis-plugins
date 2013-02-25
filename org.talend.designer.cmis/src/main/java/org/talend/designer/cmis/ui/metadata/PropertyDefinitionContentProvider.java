@@ -10,15 +10,18 @@
  ******************************************************************************/
 package org.talend.designer.cmis.ui.metadata;
 
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import java.util.List;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 public class PropertyDefinitionContentProvider implements IStructuredContentProvider {
 
 	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof PropertyDefinition<?>[])
-			return (PropertyDefinition<?>[])inputElement;
+		if (inputElement instanceof List<?>) {
+			return ((List<?>)inputElement).toArray();
+		}
+			
 		return new Object[0];
 	}
 

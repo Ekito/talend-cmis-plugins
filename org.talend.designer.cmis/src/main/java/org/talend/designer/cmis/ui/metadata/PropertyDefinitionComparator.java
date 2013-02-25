@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.talend.designer.cmis.ui.metadata;
 
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.talend.designer.cmis.model.PropertyDefinitionModel;
 
 public class PropertyDefinitionComparator extends ViewerComparator {
 
@@ -44,8 +44,8 @@ public class PropertyDefinitionComparator extends ViewerComparator {
 
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		PropertyDefinition<?> prop1 = (PropertyDefinition<?>) e1;
-		PropertyDefinition<?> prop2 = (PropertyDefinition<?>) e2;
+		PropertyDefinitionModel prop1 = (PropertyDefinitionModel) e1;
+		PropertyDefinitionModel prop2 = (PropertyDefinitionModel) e2;
 		int result = 0;
 		
 		switch (propertyIndex) {

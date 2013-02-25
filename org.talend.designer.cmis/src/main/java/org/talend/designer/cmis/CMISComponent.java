@@ -34,8 +34,11 @@ import org.talend.core.model.process.IComponentDocumentation;
 import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IExternalData;
 import org.talend.core.model.temp.ECodePart;
-import org.talend.designer.cmis.manager.TypeDefinitionManager;
+import org.talend.designer.cmis.manager.PropertyDefinitionFilter;
+import org.talend.designer.cmis.manager.QueryManager;
 import org.talend.designer.cmis.manager.impl.CMISComponentManager;
+import org.talend.designer.cmis.manager.impl.InputPropertyDefinitionFilterImpl;
+import org.talend.designer.cmis.manager.impl.OutputPropertyDefinitionFilterImpl;
 import org.talend.designer.codegen.ICodeGeneratorService;
 import org.talend.repository.ui.wizards.metadata.ContextSetsSelectionDialog;
 
@@ -52,16 +55,10 @@ public class CMISComponent extends AbstractExternalNode {
 	public static String INPUT_COMPONENT_SUFFIX = "Input";
 	public static String OUTPUT_COMPONENT_SUFFIX = "Output";
 
-	private TypeDefinitionManager modelManager; // created on open()
-
 	private CMISComponentManager cmisManager;
 
 	public CMISComponent() {
 		super();
-	}
-
-	public TypeDefinitionManager getModelManager() {
-		return modelManager;
 	}
 
 	/*
@@ -124,9 +121,26 @@ public class CMISComponent extends AbstractExternalNode {
 
 		cmisManager = new CMISComponentManager(this);
 		
-		boolean isContextDependant = cmisManager.getEditorManager().getSessionManager().isContextDependant();
+		String componentName = (String) getElementParameter("COMPONENT_NAME").getValue();
+		
+		//Set the managers corresponding to the type of component (Input or Output)
+		PropertyDefinitionFilter propertyDefinitionFilter = null;
+		QueryManager queryManager = null;
+		
+		if (componentName.endsWith(CMISComponent.INPUT_COMPONENT_SUFFIX)) {
+			propertyDefinitionFilter = new InputPropertyDefinitionFilterImpl();
+			queryManager = new QueryManager(this);
+		}else
+		{
+			propertyDefinitionFilter = new OutputPropertyDefinitionFilterImpl();
+		}
+		
+		cmisManager.getEditorManager().getTypeDefinitionManager().setPropertyDefinitionFilter(propertyDefinitionFilter);
+		cmisManager.getEditorManager().setQueryManager(queryManager);
 		
 		//Select the execution context if necessary
+		boolean isContextDependant = cmisManager.getEditorManager().getSessionManager().isContextDependant();
+		
 		IContext selectedContext = null;
 		
 		if (isContextDependant) {
@@ -141,11 +155,11 @@ public class CMISComponent extends AbstractExternalNode {
 			{
 				selectedContext = getProcess().getContextManager().getDefaultContext();
 			}
-			
 		}
 		
 		final IContext theSelectedContext = selectedContext;
 		
+		//Create the session, load the model
     	ProgressDialog progressDialog = new ProgressDialog(display.getActiveShell()) {
 
             @Override
@@ -157,7 +171,7 @@ public class CMISComponent extends AbstractExternalNode {
         			cmisManager.getEditorManager().loadModel(); // NB. or when modelManager is created
         		} catch (Exception ex) {
         			ExceptionHandler.process(ex);
-        			cmisManager.getEditorManager().getModelManager().clear();
+        			cmisManager.getEditorManager().getTypeDefinitionManager().clear();
         		}
             }
         };

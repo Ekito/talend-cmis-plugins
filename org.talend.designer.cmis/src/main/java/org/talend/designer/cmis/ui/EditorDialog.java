@@ -11,9 +11,9 @@
 package org.talend.designer.cmis.ui;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -33,7 +33,8 @@ import org.talend.commons.ui.runtime.image.ImageUtils.ICON_SIZE;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.ui.images.CoreImageProvider;
 import org.talend.designer.cmis.manager.EditorManager;
-import org.talend.designer.cmis.manager.TypeDefinitionManager;
+import org.talend.designer.cmis.manager.DefaultTypeDefinitionManagerImpl;
+import org.talend.designer.cmis.model.PropertyDefinitionModel;
 import org.talend.designer.cmis.model.TypeDefinitionModel;
 
 /**
@@ -79,7 +80,7 @@ public class EditorDialog extends Dialog {
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		sash.setLayoutData(gridData);
 		
-		createCMISTypesArea(sash);
+		createTypeDefinitionArea(sash);
 
 		String componentName = editorManager.getComponent().getComponent().getName();
 		//if componentName like '*Input' display query editor
@@ -96,39 +97,39 @@ public class EditorDialog extends Dialog {
 		return composite;
 	}
 	
-	private void createCMISTypesArea(Composite composite)
+	private void createTypeDefinitionArea(Composite composite)
 	{
 		
-		typesComposite = new TypeDefinitionSelectorComposite(composite, SWT.BORDER, editorManager.getModelManager());
+		typesComposite = new TypeDefinitionSelectorComposite(composite, SWT.BORDER, editorManager.getTypeDefinitionManager());
 		((Tree)typesComposite.getObjectTypeTreeViewer().getControl()).addSelectionListener(new SelectionListener() {
 			
 			public void widgetSelected(SelectionEvent e) {
 				Object selectedData = e.item.getData();
 				if (selectedData instanceof TypeDefinitionModel)
 				{
-					TypeDefinitionManager modelManager = editorManager.getModelManager();
+					DefaultTypeDefinitionManagerImpl modelManager = editorManager.getTypeDefinitionManager();
 					//Get the previous selected properties
-					Map<String,PropertyDefinition<?>> previousSelectedPropertyDefinitions = new HashMap<String, PropertyDefinition<?>>(modelManager.getSelectedPropertyDefinitions());
+					Map<String,PropertyDefinitionModel> previousSelectedPropertyDefinitions = new HashMap<String, PropertyDefinitionModel>(modelManager.getSelectedPropertyDefinitions());
 					
 					//Clear the selected properties on the data model
 					modelManager.clearSelectedPropertyDefinition();
 					
 					TypeDefinitionModel selectedObjectTypeNode = (TypeDefinitionModel)selectedData;
 					//Set the selected type node and the default selected property definitions 
-					modelManager.setSelectedObjectTypeNode(selectedObjectTypeNode);
+					modelManager.setSelectedTypeDefinitionModel(selectedObjectTypeNode);
 
-					PropertyDefinition<?>[] availablePropertyDefinitions = modelManager.getAvailablePropertyDefinitions();
+					List<PropertyDefinitionModel> availablePropertyDefinitions = modelManager.getAvailablePropertyDefinitions();
 					
 					
 					typesComposite.getPropertiesTableViewer().setInput(availablePropertyDefinitions);
 					
-					for (int i = 0; i < availablePropertyDefinitions.length; i++) {
-						PropertyDefinition<?> propertyDefinition = availablePropertyDefinitions[i];
-						String propertyId = propertyDefinition.getId();
+					for (PropertyDefinitionModel propertyDefinitionModel : availablePropertyDefinitions) {
+						
+						String propertyId = propertyDefinitionModel.getId();
 						if (previousSelectedPropertyDefinitions.containsKey(propertyId))
 						{
-							typesComposite.getPropertiesTableViewer().setChecked(propertyDefinition, true);
-							modelManager.addSelectedPropertyDefinition(propertyDefinition);
+							typesComposite.getPropertiesTableViewer().setChecked(propertyDefinitionModel, true);
+							modelManager.addSelectedPropertyDefinition(propertyDefinitionModel);
 						}
 					}
 					

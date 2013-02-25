@@ -12,6 +12,7 @@ package org.talend.designer.cmis.manager;
 
 import org.talend.core.model.process.IExternalNode;
 import org.talend.designer.cmis.manager.impl.CMISFolderManager;
+import org.talend.designer.cmis.manager.impl.SessionManager;
 
 public class FunctionManager {
 

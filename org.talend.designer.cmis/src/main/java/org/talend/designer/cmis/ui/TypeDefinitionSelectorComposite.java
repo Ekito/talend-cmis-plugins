@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.talend.designer.cmis.ui;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -25,18 +24,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.talend.designer.cmis.CMISComponent;
 import org.talend.designer.cmis.i18n.Messages;
-import org.talend.designer.cmis.manager.TypeDefinitionManager;
+import org.talend.designer.cmis.manager.DefaultTypeDefinitionManagerImpl;
+import org.talend.designer.cmis.model.PropertyDefinitionModel;
 import org.talend.designer.cmis.model.TypeDefinitionModel;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionContentProvider;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionLabelProvider;
+import org.talend.designer.cmis.ui.metadata.PropertyDefinitionTableViewer;
 import org.talend.designer.cmis.ui.metadata.TypeDefinitionLabelProvider;
 import org.talend.designer.cmis.ui.metadata.TypeDefinitionTreeContentProvider;
 import org.talend.designer.cmis.ui.metadata.TypeDefinitionTreeViewer;
-import org.talend.designer.cmis.ui.metadata.PropertyDefinitionTableViewer;
-import org.talend.designer.cmis.ui.metadata.PropertyDefinitionContentProvider;
-import org.talend.designer.cmis.ui.metadata.PropertyDefinitionLabelProvider;
 
 public class TypeDefinitionSelectorComposite extends Composite {
 
-	private TypeDefinitionManager modelManager;
+	private DefaultTypeDefinitionManagerImpl modelManager;
 	private TypeDefinitionTreeViewer objectTypeTreeViewer;
 	private PropertyDefinitionTableViewer propertiesTableViewer;
 
@@ -47,7 +47,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
         setLayout(layout);
 	}
 	
-	public TypeDefinitionSelectorComposite(Composite parent, int style, TypeDefinitionManager modelManager) {
+	public TypeDefinitionSelectorComposite(Composite parent, int style, DefaultTypeDefinitionManagerImpl modelManager) {
 		this(parent, style);
 		
 		this.modelManager = modelManager;
@@ -92,7 +92,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
 		attributeComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		createAttributeToolbar(attributeComposite);
-		createCMISAttributesTable(attributeComposite);
+		createPropertyDefinitionsTable(attributeComposite);
 		
 	}
 	
@@ -118,7 +118,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
 		objectTypeTreeViewer.setContentProvider(new TypeDefinitionTreeContentProvider());
 		objectTypeTreeViewer.setLabelProvider(new TypeDefinitionLabelProvider());
 		
-		ArrayList<TypeDefinitionModel> treeInput = modelManager.getAvailableTypeDefinition();
+		List<TypeDefinitionModel> treeInput = modelManager.getAvailableTypeDefinition();
 		objectTypeTreeViewer.setInput(treeInput);
 		
 		//Select the current object type in the tree
@@ -143,7 +143,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
         toolBarMgr.getControl().setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     }
 	
-	private void createCMISAttributesTable(Composite attributeComposite) {
+	private void createPropertyDefinitionsTable(Composite attributeComposite) {
 		
 		propertiesTableViewer = PropertyDefinitionTableViewer.newCheckList(attributeComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		
@@ -151,17 +151,18 @@ public class TypeDefinitionSelectorComposite extends Composite {
 		propertiesTableViewer.setLabelProvider(new PropertyDefinitionLabelProvider());
 		
 		// The input for the table viewer is the list of available properties for the selected object.
-		PropertyDefinition<?>[] propertyDefinitions = modelManager.getAvailablePropertyDefinitions();
+		List<PropertyDefinitionModel> propertyDefinitions = modelManager.getAvailablePropertyDefinitions();
+		
 		propertiesTableViewer.setInput(propertyDefinitions);
 
-		Map<String, PropertyDefinition<?>> selectedPropertyDefinitions = modelManager.getSelectedPropertyDefinitions();
+		Map<String, PropertyDefinitionModel> selectedPropertyDefinitions = modelManager.getSelectedPropertyDefinitions();
 		
-		for (int i = 0; i < propertyDefinitions.length; i++) {
-			PropertyDefinition<?> propertyDefinition = propertyDefinitions[i];
-			String propertyId = propertyDefinition.getId();
+		for (PropertyDefinitionModel propertyDefinitionModel : propertyDefinitions) {
+			
+			String propertyId = propertyDefinitionModel.getId();
 			if (selectedPropertyDefinitions.containsKey(propertyId))
 			{
-				propertiesTableViewer.setChecked(propertyDefinition, true);
+				propertiesTableViewer.setChecked(propertyDefinitionModel, true);
 			} 
 			
 			//If the property is required and it's an output component,
@@ -170,10 +171,10 @@ public class TypeDefinitionSelectorComposite extends Composite {
 					.getElementParameter("COMPONENT_NAME").getValue();
 			
 			if (componentName.endsWith(CMISComponent.OUTPUT_COMPONENT_SUFFIX)
-					&& propertyDefinition.isRequired())
+					&& propertyDefinitionModel.isRequired())
 			{
-				propertiesTableViewer.setChecked(propertyDefinition, true);
-				modelManager.addSelectedPropertyDefinition(propertyDefinition);
+				propertiesTableViewer.setChecked(propertyDefinitionModel, true);
+				modelManager.addSelectedPropertyDefinition(propertyDefinitionModel);
 			}
 			
 		}
@@ -181,7 +182,7 @@ public class TypeDefinitionSelectorComposite extends Composite {
 		propertiesTableViewer.addCheckStateListener(new ICheckStateListener() {
 			
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				PropertyDefinition<?> propertyDefinition = (PropertyDefinition<?>) event.getElement();
+				PropertyDefinitionModel propertyDefinition = (PropertyDefinitionModel) event.getElement();
 				if (event.getChecked())
 				{
 					modelManager.addSelectedPropertyDefinition(propertyDefinition);

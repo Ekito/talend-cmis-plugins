@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.talend.designer.cmis.ui.metadata;
 
-import java.util.List;
-
-import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -20,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.talend.commons.ui.runtime.image.ECoreImage;
 import org.talend.commons.ui.runtime.image.ImageProvider;
 import org.talend.designer.cmis.CMISComponent;
+import org.talend.designer.cmis.model.PropertyDefinitionModel;
 
 public class PropertyDefinitionLabelProvider implements ITableLabelProvider {
 
@@ -33,7 +31,7 @@ public class PropertyDefinitionLabelProvider implements ITableLabelProvider {
 		}
 		else if (columnIndex == 3)
 		{
-			PropertyDefinition<?> propertyDefinition = (PropertyDefinition<?>) element;
+			PropertyDefinitionModel propertyDefinition = (PropertyDefinitionModel) element;
 			if (propertyDefinition.isRequired()) {
 	            return ImageProvider.getImage(ECoreImage.MODULE_REQUIRED_ICON);
 	        } else {
@@ -45,9 +43,8 @@ public class PropertyDefinitionLabelProvider implements ITableLabelProvider {
 	}
 
 	public String getColumnText(Object element, int columnIndex) {
-		PropertyDefinition<?> propertyDefinition = (PropertyDefinition<?>) element;
+		PropertyDefinitionModel propertyDefinition = (PropertyDefinitionModel) element;
 		String result = null;
-		List<?> defaultValue;
 		switch (columnIndex) {
 		case 0:
 			result = propertyDefinition.getId();
@@ -56,14 +53,13 @@ public class PropertyDefinitionLabelProvider implements ITableLabelProvider {
 			result = propertyDefinition.getDisplayName();
 			break;
 		case 2 :
-			result = propertyDefinition.getPropertyType().value();
+			result = propertyDefinition.getPropertyType();
 			break;
 		case 3 :
 			result = "";
 			break;
 		case 4 :
-			defaultValue = propertyDefinition.getDefaultValue();
-			result =  defaultValue != null ? defaultValue.toString() : null;
+			result = propertyDefinition.getDefaultValue();
 			break;
 		default :
 			break; 	

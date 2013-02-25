@@ -11,8 +11,8 @@
 package org.talend.designer.cmis.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -22,28 +22,22 @@ import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 public class TypeDefinitionModel {
 
 	private TypeDefinitionModel parent;
-	private String objectTypeId;
-	private String baseTypeId;
-	
-	private ArrayList<TypeDefinitionModel> children;
-	private PropertyDefinition<?>[] propertyDefinitions;
-	private String displayName;
 	private ObjectType objectType;
+	
+	private List<TypeDefinitionModel> children;
+	private List<PropertyDefinitionModel> propertyDefinitions;
 	
 	public TypeDefinitionModel(TypeDefinitionModel parent, ObjectType objectType) {
 		super();
-		this.objectType = objectType;
 		this.parent = parent;
-		this.objectTypeId = objectType.getId();
-		this.baseTypeId = objectType.getBaseTypeId().value();
-		this.displayName = objectType.getDisplayName();
+		this.objectType = objectType;
 	}
 	
 	public TypeDefinitionModel getParent() {
 		return parent;
 	}
 
-	public ArrayList<TypeDefinitionModel> getChildren() {
+	public List<TypeDefinitionModel> getChildren() {
 		if (children == null)
 		{
 			fillChildren(objectType);
@@ -52,18 +46,18 @@ public class TypeDefinitionModel {
 	}
 
 	public String getObjectTypeId() {
-		return objectTypeId;
+		return objectType.getId();
 	}
 	
 	public String getBaseTypeId() {
-		return baseTypeId;
+		return objectType.getBaseTypeId().value();
 	}
 	
 	public String getDisplayName() {
-		return displayName;
+		return objectType.getDisplayName();
 	}
 	
-	public PropertyDefinition<?>[] getPropertyDefinitions() {
+	public List<PropertyDefinitionModel> getPropertyDefinitions() {
 		if (propertyDefinitions == null)
 		{
 			fillPropertyDefinitions(objectType);
@@ -72,9 +66,18 @@ public class TypeDefinitionModel {
 	}
 	
 	private void fillPropertyDefinitions(ObjectType objectType) {
-		Map<String, PropertyDefinition<?>> propertyDefinitionsMap = objectType.getPropertyDefinitions();
-		Collection<PropertyDefinition<?>> propertyDefinitionCollection = propertyDefinitionsMap.values();
-		propertyDefinitions = propertyDefinitionCollection.toArray(new PropertyDefinition<?>[propertyDefinitionCollection.size()]);
+		
+		Map<String, PropertyDefinition<?>> propertyDefinitionsMap = objectType
+				.getPropertyDefinitions();
+		
+		propertyDefinitions = new ArrayList<PropertyDefinitionModel>();
+		
+		for (PropertyDefinition<?> propertyDefinition : propertyDefinitionsMap
+				.values()) {
+			PropertyDefinitionModel propertyDefinitionModel = new PropertyDefinitionModel(objectType.getId(), propertyDefinition);
+			propertyDefinitions.add(propertyDefinitionModel);
+		}
+		
 	}
 
 	private void fillChildren(ObjectType objectType) {
@@ -94,7 +97,7 @@ public class TypeDefinitionModel {
 	public TypeDefinitionModel findById(String objectTypeId) {
 		TypeDefinitionModel result = null;
 
-		if (objectTypeId.equals(this.objectTypeId)) {
+		if (objectTypeId.equals(objectType.getId())) {
 			result = this;
 		} else {
 			for (Iterator<TypeDefinitionModel> iterator = getChildren().iterator(); iterator

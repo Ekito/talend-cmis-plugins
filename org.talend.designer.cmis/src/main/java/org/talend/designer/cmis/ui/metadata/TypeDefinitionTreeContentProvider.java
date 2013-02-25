@@ -13,6 +13,7 @@ package org.talend.designer.cmis.ui.metadata;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -31,7 +32,7 @@ public class TypeDefinitionTreeContentProvider implements ITreeContentProvider {
 	 */
 	public Object[] getChildren(Object parentElement) {
 		
-		ArrayList<TypeDefinitionModel> childrenList = ((TypeDefinitionModel)parentElement).getChildren();
+		List<TypeDefinitionModel> childrenList = ((TypeDefinitionModel)parentElement).getChildren();
 		Collections.sort(childrenList, new Comparator<TypeDefinitionModel>() {
 			public int compare(TypeDefinitionModel o1, TypeDefinitionModel o2)
 			{
