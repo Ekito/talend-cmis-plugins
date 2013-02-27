@@ -39,7 +39,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public static final String PARAM_PROPERTY_MAPPING = "PROPERTY_MAPPING";
 
 	public static final String PARAM_OBJECT_TYPE_ID = "OBJECT_TYPE_ID";
-	
+
 	public static final String PARAM_ITEM_ID = "ID";
 
 	public static final String PARAM_ITEM_TYPE = "TYPE";
@@ -47,9 +47,9 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public static final String PARAM_ITEM_DEFAULT = "DEFAULT";
 
 	private IExternalNode component;
-	
+
 	private SessionManager sessionManager;
-	
+
 	private PropertyDefinitionFilter propertyDefinitionFilter;
 
 	public void setPropertyDefinitionFilter(
@@ -61,7 +61,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	private List<TypeDefinitionModel> availableTypeDefinitionModel = new ArrayList<TypeDefinitionModel>();
 	private List<PropertyDefinitionModel> availablePropertyDefinitions;
 	private Map<String, PropertyDefinitionModel> availablePropertyDefinitionsMap;
-	
+
 	private TypeDefinitionModel selectedTypeDefinitionModel;
 	private Map<String, PropertyDefinitionModel> selectedPropertyDefinitions = new HashMap<String, PropertyDefinitionModel>();
 
@@ -76,7 +76,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public List<TypeDefinitionModel> getAvailableTypeDefinition() {
 		return availableTypeDefinitionModel;
 	}
-	
+
 	public List<PropertyDefinitionModel> getAvailablePropertyDefinitions() {
 		return availablePropertyDefinitions;
 	}
@@ -92,23 +92,32 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public void setSelectedTypeDefinitionModel(
 			TypeDefinitionModel selectedObjectTypeNode) {
 		this.selectedTypeDefinitionModel = selectedObjectTypeNode;
-		
+
 		availablePropertyDefinitions = selectedObjectTypeNode.getPropertyDefinitions();
-		
+
 		if (propertyDefinitionFilter != null)
 		{
-			availablePropertyDefinitions = propertyDefinitionFilter.filter(availablePropertyDefinitions);
+			ArrayList<PropertyDefinitionModel> selectablePropertyDefinition = new ArrayList<PropertyDefinitionModel>();
+
+			for (PropertyDefinitionModel propertyDefinitionModel : availablePropertyDefinitions) {
+
+				if (propertyDefinitionFilter.isSelectable(propertyDefinitionModel))
+				{
+					selectablePropertyDefinition.add(propertyDefinitionModel);	
+				}
+			}
+			availablePropertyDefinitions = selectablePropertyDefinition;
 		}
-		
+
 		availablePropertyDefinitionsMap = new HashMap<String, PropertyDefinitionModel>();
 
 		for (PropertyDefinitionModel propertyDefinitionModel : availablePropertyDefinitions) {
-			
+
 			availablePropertyDefinitionsMap.put(propertyDefinitionModel.getId(), propertyDefinitionModel);
 		}
-		
+
 	}
-	
+
 	/**
 	 * @return the selected TypeDefinition
 	 */
@@ -130,7 +139,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public void clearSelectedPropertyDefinition() {
 		selectedPropertyDefinitions = new HashMap<String, PropertyDefinitionModel>();
 	}
-	
+
 	public Map<String, PropertyDefinitionModel> getSelectedPropertyDefinitions() {
 		return selectedPropertyDefinitions;
 	}
@@ -171,14 +180,14 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 
 			if (foundTypeDefinition != null)
 				setSelectedTypeDefinitionModel(foundTypeDefinition);
-				
+
 		}
 		//Select the first node if any selected
 		if (getSelectedTypeDefinition() == null)
 		{
 			setSelectedTypeDefinitionModel(availableTypeDefinitionModel.get(0));
 		}
-		
+
 		// Get the selected object properties
 		this.loadMetadatas(PARAM_PROPERTY_MAPPING);
 
@@ -212,7 +221,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 				.getElementParameter(metadataMappingParamName).getValue();
 
 		Map<String, PropertyDefinitionModel> propertyDefinitionMap = getAvailablePropertyDefinitionsMap();
-		
+
 		for (Map<String, String> metadataMappingRow : new ArrayList<Map<String, String>>(
 				metadataMappingTable)) {
 			String propertyId = metadataMappingRow.get(PARAM_ITEM_ID);
@@ -242,7 +251,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 		for (Map<String, String> metadataMappingRow : metadataMappingTable) {
 			String propertyId = metadataMappingRow.get(PARAM_ITEM_ID);
 
-			
+
 			// trying to find the corresponding existing metadata...
 			PropertyDefinitionModel propertyDef = selectedPropertyDefinitions
 					.get(propertyId);
@@ -274,16 +283,16 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 		// Sort the mapping table
 		Collections.sort(metadataMappingTable,
 				new Comparator<Map<String, String>>() {
-					public int compare(Map<String, String> o1,
-							Map<String, String> o2) {
-						String paramItemId1 = o1.get(PARAM_ITEM_ID);
-						paramItemId1 = paramItemId1 != null ? paramItemId1 : "";
-						String paramItemId2 = o2.get(PARAM_ITEM_ID);
-						paramItemId2 = paramItemId2 != null ? paramItemId2 : "";
-						return paramItemId1.compareTo(
-								paramItemId2);
-					};
-				});
+			public int compare(Map<String, String> o1,
+					Map<String, String> o2) {
+				String paramItemId1 = o1.get(PARAM_ITEM_ID);
+				paramItemId1 = paramItemId1 != null ? paramItemId1 : "";
+				String paramItemId2 = o2.get(PARAM_ITEM_ID);
+				paramItemId2 = paramItemId2 != null ? paramItemId2 : "";
+				return paramItemId1.compareTo(
+						paramItemId2);
+			};
+		});
 	}
 
 	/**
@@ -317,8 +326,8 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 			String objectTypeId = getSelectedTypeDefinition().getObjectTypeId();
 			metadataMappingRow.put(PARAM_OBJECT_TYPE_ID, objectTypeId );
 			metadataMappingRow.put(PARAM_ITEM_ID, propertyDef.getId());
-//			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType());
-//			metadataMappingRow.put(PARAM_ITEM_DEFAULT,	propertyDef.getDefaultValue());
+			//			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType());
+			//			metadataMappingRow.put(PARAM_ITEM_DEFAULT,	propertyDef.getDefaultValue());
 		}
 	}
 	public IExternalNode getComponent() {

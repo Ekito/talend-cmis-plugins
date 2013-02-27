@@ -34,11 +34,11 @@ import org.talend.core.model.process.IComponentDocumentation;
 import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IExternalData;
 import org.talend.core.model.temp.ECodePart;
+import org.talend.designer.cmis.manager.InputPropertyDefinitionFilterImpl;
 import org.talend.designer.cmis.manager.PropertyDefinitionFilter;
 import org.talend.designer.cmis.manager.QueryManager;
 import org.talend.designer.cmis.manager.impl.CMISComponentManager;
-import org.talend.designer.cmis.manager.impl.InputPropertyDefinitionFilterImpl;
-import org.talend.designer.cmis.manager.impl.OutputPropertyDefinitionFilterImpl;
+import org.talend.designer.cmis.manager.impl.CMISOutputPropertyDefinitionFilterImpl;
 import org.talend.designer.codegen.ICodeGeneratorService;
 import org.talend.repository.ui.wizards.metadata.ContextSetsSelectionDialog;
 
@@ -132,7 +132,7 @@ public class CMISComponent extends AbstractExternalNode {
 			queryManager = new QueryManager(this);
 		}else
 		{
-			propertyDefinitionFilter = new OutputPropertyDefinitionFilterImpl();
+			propertyDefinitionFilter = new CMISOutputPropertyDefinitionFilterImpl();
 		}
 		
 		cmisManager.getEditorManager().getTypeDefinitionManager().setPropertyDefinitionFilter(propertyDefinitionFilter);

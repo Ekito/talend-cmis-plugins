@@ -8,12 +8,8 @@
  * Contributors:
  *     Julien Boulay - Ekito - www.ekito.fr - initial API and implementation
  ******************************************************************************/
-package org.talend.designer.cmis.manager.impl;
+package org.talend.designer.cmis.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.talend.designer.cmis.manager.PropertyDefinitionFilter;
 import org.talend.designer.cmis.model.PropertyDefinitionModel;
 
 /**
@@ -24,19 +20,11 @@ import org.talend.designer.cmis.model.PropertyDefinitionModel;
  */
 public class InputPropertyDefinitionFilterImpl implements PropertyDefinitionFilter {
 
-	
-	public List<PropertyDefinitionModel> filter(
-			List<PropertyDefinitionModel> propertyDefinitions) {
-
-		ArrayList<PropertyDefinitionModel> selectablePropertyDefinition = new ArrayList<PropertyDefinitionModel>();
-
-		for (PropertyDefinitionModel propertyDefinition : propertyDefinitions) {
-			
-			if (propertyDefinition.isQueryable()) {
-				selectablePropertyDefinition.add(propertyDefinition);
-			}
-		}
-		return selectablePropertyDefinition;
+	@Override
+	public boolean isSelectable(PropertyDefinitionModel propertyDefinitionModel) {
+		return propertyDefinitionModel.isQueryable();
 	}
+
+	
 
 }
