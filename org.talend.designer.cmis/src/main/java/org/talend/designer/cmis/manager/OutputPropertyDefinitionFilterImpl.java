@@ -20,7 +20,6 @@ import org.talend.designer.cmis.model.PropertyDefinitionModel;
  */
 public class OutputPropertyDefinitionFilterImpl implements PropertyDefinitionFilter{
 
-	@Override
 	public boolean isSelectable(PropertyDefinitionModel propertyDefinitionModel) {
 		return propertyDefinitionModel.isUpdatable();
 	}
