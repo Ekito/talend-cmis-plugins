@@ -27,9 +27,11 @@ public class QueryManager {
 		Character alias = query.appendFrom(objectTypeId);
 
 		for (PropertyDefinitionModel queryProperty : selectedPropertyDefinitions.values()) {
-			String propertyId = queryProperty.getId();
+			if (queryProperty != null) {
+				String propertyId = queryProperty.getId();
 
-			query.appendSelect(alias, propertyId);
+				query.appendSelect(alias, propertyId);
+			}
 		}
 
 		String queryStatement = TalendTextUtils.addQuotes(query.getQueryStatement());

@@ -192,9 +192,6 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 		component.getElementParameter(PARAM_OBJECT_TYPE).setValue(
 				selectedTypeDefinitionModel.getObjectTypeId());
 
-		component.getElementParameter(PARAM_OBJECT_TYPE_ID).setValue(
-				"\"" + selectedTypeDefinitionModel.getObjectTypeId() + "\"");
-
 		component.getElementParameter(PARAM_BASE_TYPE_ID).setValue(
 				selectedTypeDefinitionModel.getBaseTypeId());
 
@@ -254,6 +251,7 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 			if (propertyDef == null) {
 				// has been removed ; let's remove it from the parameter
 				metadataMappingTable.remove(metadataMappingRow);
+				remainingPropertyDefinitions.remove(propertyId);
 				continue;
 			}
 
@@ -274,8 +272,12 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 				new Comparator<Map<String, String>>() {
 					public int compare(Map<String, String> o1,
 							Map<String, String> o2) {
-						return o1.get(PARAM_ITEM_ID).compareTo(
-								o2.get(PARAM_ITEM_ID));
+						String paramItemId1 = o1.get(PARAM_ITEM_ID);
+						paramItemId1 = paramItemId1 != null ? paramItemId1 : "";
+						String paramItemId2 = o2.get(PARAM_ITEM_ID);
+						paramItemId2 = paramItemId2 != null ? paramItemId2 : "";
+						return paramItemId1.compareTo(
+								paramItemId2);
 					};
 				});
 	}
@@ -311,8 +313,8 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 			String objectTypeId = getSelectedTypeDefinition().getObjectTypeId();
 			metadataMappingRow.put(PARAM_OBJECT_TYPE_ID, objectTypeId );
 			metadataMappingRow.put(PARAM_ITEM_ID, propertyDef.getId());
-			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType());
-			metadataMappingRow.put(PARAM_ITEM_DEFAULT,	propertyDef.getDefaultValue());
+//			metadataMappingRow.put(PARAM_ITEM_TYPE, propertyDef.getPropertyType());
+//			metadataMappingRow.put(PARAM_ITEM_DEFAULT,	propertyDef.getDefaultValue());
 		}
 	}
 	public IExternalNode getComponent() {
