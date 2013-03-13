@@ -186,7 +186,7 @@ public class CMISHelperTest {
 		
 		Document doc = null;
 		try {
-			doc = CMISHelper.updateDocument(session, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
+			doc = CMISHelper.updateDocument(session, DOCUMENT_2_FOLDER_PATH, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

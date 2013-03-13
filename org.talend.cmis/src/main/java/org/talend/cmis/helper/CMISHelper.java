@@ -29,7 +29,7 @@ public final class CMISHelper {
 		//Check that the document does not already exist
 		ItemIterable<QueryResult> queryResult = find(session, keys);
 
-		if (queryResult.getTotalNumItems() > 0)
+		if (queryResult != null && queryResult.getTotalNumItems() > 0)
 		{
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys));
 		}
@@ -40,11 +40,20 @@ public final class CMISHelper {
 	}
 
 	public static Document createOrUpdateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+
+		Folder parentFolder =null;
+
+//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
+//		if (folderPath != null)
+//		{
+//			parentFolder = (Folder)session.getObjectByPath(folderPath);
+//		}
+		
 		//Check if the document already exists
-		ItemIterable<QueryResult> queryResult = find(session, keys);
+		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
 		Document document = null;
-		if (queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getTotalNumItems() == 0)
 		{
 			document = createDocument(session, folderPath, properties, contentStreamFilePath);
 		}
@@ -65,14 +74,23 @@ public final class CMISHelper {
 		return document;
 	}
 
-	public static Document updateDocument(Session session, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+	public static Document updateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+
+		Folder parentFolder =null;
+
+//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
+//		if (folderPath != null)
+//		{
+//			parentFolder = (Folder)session.getObjectByPath(folderPath);
+//		}
+		
 		//Check if the document already exists
-		ItemIterable<QueryResult> queryResult = find(session, keys);
+		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
 		Document document = null;
-		if (queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getTotalNumItems() == 0)
 		{
-			throw new Exception("Any document exist with the following criteria : " + formatPredicate(keys));
+			throw new Exception("No document exists with the following criteria : " + formatPredicate(keys));
 		}
 		else if (queryResult.getTotalNumItems() == 1)
 		{
@@ -96,11 +114,11 @@ public final class CMISHelper {
 	{
 		deleteCmisObject(session, keys, null);
 	}
-	
+
 	public static void deleteCmisObject(Session session, Map<String, Object> keys, String folderPath) throws Exception
 	{
 		Folder parentFolder =null;
-		
+
 		if (folderPath != null)
 		{
 			parentFolder = (Folder)session.getObjectByPath(folderPath);
@@ -108,9 +126,9 @@ public final class CMISHelper {
 		//Check if the object exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
-		if (queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getTotalNumItems() == 0)
 		{
-			throw new Exception("Any object exist with the following criteria : " + formatPredicate(keys,parentFolder));
+			throw new Exception("No object exists with the following criteria : " + formatPredicate(keys,parentFolder));
 		}
 		else if (queryResult.getTotalNumItems() == 1)
 		{
@@ -127,7 +145,7 @@ public final class CMISHelper {
 		}
 
 	}
-	
+
 
 	public static Folder createFolder(Session session, String parentFolderPath, Map<String, Object> properties, Map<String, Object> keys, boolean recursive) throws Exception
 	{
@@ -148,25 +166,25 @@ public final class CMISHelper {
 				parentProperties.put(PropertyIds.NAME, parentName);
 				//By default, parent folder is created with the same type as it child
 				parentProperties.put(PropertyIds.OBJECT_TYPE_ID, properties.get(PropertyIds.OBJECT_TYPE_ID));
-				
+
 				targetFolder = createFolder(session, grandParentFolderPath, parentProperties, parentProperties, recursive);
 			}else {
 				throw e;
 			}
 		}
-		
+
 		ItemIterable<QueryResult> queryResult = find(session, keys, targetFolder);
 
-		if (queryResult.getTotalNumItems() > 0)
+		if (queryResult != null && queryResult.getTotalNumItems() > 0)
 		{
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys, targetFolder));
 		}
-		
+
 		Folder folder = targetFolder.createFolder(properties);
 
 		return folder;
 	}
-	
+
 	private static Document createDocument(Session session, String folderPath, Map<String, Object> properties, String contentStreamFilePath) throws FileNotFoundException
 	{
 		//Retrieve the folder from path
@@ -178,15 +196,23 @@ public final class CMISHelper {
 
 		return document;
 	}
-	
+
 	private static Document updateDocument(Session session,
 			Document document, Map<String, Object> properties,
 			String contentStreamFilePath) throws FileNotFoundException {
-		ObjectId objectId = document.checkOut();
-		document = (Document) session.getObject(objectId);
+		
+		if (!document.isVersionSeriesCheckedOut())
+		{
+			ObjectId objectId = document.checkOut();
+			document = (Document) session.getObject(objectId);
+		}else
+		{
+			String objectId = document.getVersionSeriesCheckedOutId();
+			document = (Document) session.getObject(session.createObjectId(objectId));
+		}
 		document.checkIn(false, properties, null, "new version from Talend");
 		ContentStream contentStream = null;
-		
+
 		if (contentStreamFilePath != null)
 		{
 			contentStream = createContentStream(session, contentStreamFilePath);
@@ -230,27 +256,33 @@ public final class CMISHelper {
 
 	private static ItemIterable<QueryResult> find(Session session,
 			Map<String, Object> keys, ObjectId folderId) {
+		
+		ItemIterable<QueryResult> queryResult = null;
 
-		StringBuilder queryStatement = new StringBuilder();
+		if (keys != null && keys.size() > 0)
+		{
+			StringBuilder queryStatement = new StringBuilder();
 
-		String objectTypeId = (String) keys.get(PropertyIds.OBJECT_TYPE_ID);
+			String objectTypeId = (String) keys.get(PropertyIds.OBJECT_TYPE_ID);
 
-		queryStatement.append("SELECT ")
-		.append(PropertyIds.OBJECT_ID)
-		.append(" FROM ")
-		.append(objectTypeId)
-		.append(" WHERE ")
-		.append(formatPredicate(keys, folderId));
+			queryStatement.append("SELECT ")
+			.append(PropertyIds.OBJECT_ID)
+			.append(" FROM ")
+			.append(objectTypeId)
+			.append(" WHERE ")
+			.append(formatPredicate(keys, folderId));
 
-		return session.query(queryStatement.toString(), false);
+			queryResult = session.query(queryStatement.toString(), false);
+		}
+		return queryResult;
 
 	}
-	
+
 	private static String formatPredicate(Map<String, Object> keys)
 	{
 		return formatPredicate(keys, null);
 	}
-	
+
 	private static String formatPredicate(Map<String, Object> keys, ObjectId folderId)
 	{
 		StringBuilder predicate = new StringBuilder();
@@ -270,21 +302,21 @@ public final class CMISHelper {
 				.append("'");
 			}
 		}
-		
+
 		if (folderId != null)
 		{
 			if (predicate.length() > 0)
 			{
 				predicate.append(" and ");
 			}
-			
+
 			predicate.append("IN_FOLDER('")
-				.append(folderId.getId())
-				.append("')");
+			.append(folderId.getId())
+			.append("')");
 		}
 
 		return predicate.toString();
 	}
- 
-	
+
+
 }
