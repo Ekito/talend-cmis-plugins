@@ -18,7 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.IExternalNode;
+import org.talend.core.model.utils.TalendTextUtils;
 import org.talend.designer.cmis.manager.impl.SessionManager;
 import org.talend.designer.cmis.model.PropertyDefinitionModel;
 import org.talend.designer.cmis.model.TypeDefinitionModel;
@@ -160,14 +162,29 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 	public void load() {
 		this.clear();
 
-		// load all the TypeDefinition from the CMIS server.
-		availableTypeDefinitionModel = sessionManager.getTypeDefinitionModels();
+		String selectedBaseTypeId = (String) getComponent()
+				.getElementParameter(PARAM_BASE_TYPE_ID).getValue();
 
-		// Get the selected object type
+		// load all the TypeDefinition from the CMIS server.
+		availableTypeDefinitionModel = sessionManager.getTypeDefinitionModels(selectedBaseTypeId);
+
+		// Get the selected ObjectType (hidden field)
 		String selectedTypeDefinition = (String) getComponent()
 				.getElementParameter(PARAM_OBJECT_TYPE).getValue();
 
-		selectedTypeDefinition = selectedTypeDefinition.replaceAll("\"", "");
+		//If ObjectTypeId (displayed field) exists, get the slectedTypeDefinition from here 
+		IElementParameter objectTypeIdElemParam = getComponent().getElementParameter(PARAM_OBJECT_TYPE_ID);
+		if (objectTypeIdElemParam != null)
+		{
+			String objectTypeId = (String) objectTypeIdElemParam.getValue();
+			
+			if (objectTypeId != null && !objectTypeId.equals(""))
+			{
+				selectedTypeDefinition = objectTypeId;
+			}
+		}
+
+		selectedTypeDefinition = TalendTextUtils.removeQuotes(selectedTypeDefinition);
 
 		// Create a real model for the TreeViewer for a better management of the
 		// tree nodes
@@ -200,6 +217,14 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 
 		component.getElementParameter(PARAM_OBJECT_TYPE).setValue(
 				selectedTypeDefinitionModel.getObjectTypeId());
+
+		IElementParameter objectTypeIdElemParam = component.getElementParameter(PARAM_OBJECT_TYPE_ID);
+		
+		if (objectTypeIdElemParam != null)
+		{
+			String objectTypeId = selectedTypeDefinitionModel.getObjectTypeId();
+			objectTypeIdElemParam.setValue(TalendTextUtils.addQuotes(objectTypeId));
+		}
 
 		component.getElementParameter(PARAM_BASE_TYPE_ID).setValue(
 				selectedTypeDefinitionModel.getBaseTypeId());
