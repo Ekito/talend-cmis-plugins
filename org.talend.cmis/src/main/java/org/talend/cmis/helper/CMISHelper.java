@@ -3,9 +3,14 @@ package org.talend.cmis.helper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,7 +32,15 @@ public final class CMISHelper {
 	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
 
 		//Check that the document does not already exist
-		ItemIterable<QueryResult> queryResult = find(session, keys);
+		Folder parentFolder =null;
+
+		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
+		if (folderPath != null)
+		{
+			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		}
+
+		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
 		if (queryResult != null && queryResult.getTotalNumItems() > 0)
 		{
@@ -43,12 +56,12 @@ public final class CMISHelper {
 
 		Folder parentFolder =null;
 
-//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-//		if (folderPath != null)
-//		{
-//			parentFolder = (Folder)session.getObjectByPath(folderPath);
-//		}
-		
+		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
+		//		if (folderPath != null)
+		//		{
+		//			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		//		}
+
 		//Check if the document already exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
@@ -78,12 +91,12 @@ public final class CMISHelper {
 
 		Folder parentFolder =null;
 
-//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-//		if (folderPath != null)
-//		{
-//			parentFolder = (Folder)session.getObjectByPath(folderPath);
-//		}
-		
+		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
+		//		if (folderPath != null)
+		//		{
+		//			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		//		}
+
 		//Check if the document already exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
@@ -200,7 +213,7 @@ public final class CMISHelper {
 	private static Document updateDocument(Session session,
 			Document document, Map<String, Object> properties,
 			String contentStreamFilePath) throws FileNotFoundException {
-		
+
 		if (!document.isVersionSeriesCheckedOut())
 		{
 			ObjectId objectId = document.checkOut();
@@ -256,7 +269,7 @@ public final class CMISHelper {
 
 	private static ItemIterable<QueryResult> find(Session session,
 			Map<String, Object> keys, ObjectId folderId) {
-		
+
 		ItemIterable<QueryResult> queryResult = null;
 
 		if (keys != null && keys.size() > 0)
@@ -318,5 +331,89 @@ public final class CMISHelper {
 		return predicate.toString();
 	}
 
+	public static CmisObject getObjectByPath(Session session, String path)
+	{
+		return session.getObjectByPath(path);
+	}
+
+	public void extractCMISObjectContent(CmisObject cmisObject, String contentPath)
+	{
+		if (cmisObject instanceof Document)
+		{
+			Document cmisDocument = (Document) cmisObject;
+			extractDocumentContent(cmisDocument, contentPath);
+		}
+		else if (cmisObject instanceof Folder)
+		{
+			Folder cmisFolder = (Folder) cmisObject;
+			ItemIterable<CmisObject> childrens = cmisFolder.getChildren();
+
+			//Read the document list of the folder and download the content
+			for (Iterator<CmisObject> childIterator = childrens.iterator(); childIterator.hasNext();) {
+
+
+				CmisObject childObject = (CmisObject) childIterator.next();
+
+				if (childObject instanceof Document)
+				{
+					Document cmisDocument = (Document) childObject;
+					extractDocumentContent(cmisDocument, contentPath);
+					//TODO : add "download content recursively" option and download content for subfolders
+
+				}
+			}
+		}
+	}
+
+	public void extractDocumentContent(Document cmisDocument, String contentPath)
+	{
+		String filename = cmisDocument.getContentStreamFileName();
+
+		//Test if filename is not null, else this document has not content
+		if (filename != null)
+		{
+			InputStream inputStream = cmisDocument.getContentStream().getStream();
+			OutputStream outputStream = null;
+			try
+			{
+				//Check that the contentPath exist
+				checkContentPath(contentPath);
+				outputStream = new FileOutputStream(contentPath + "/" + filename);
+				byte buf[]=new byte[1024];
+				int len;
+				while((len = inputStream.read(buf))>0)
+				{
+					outputStream.write(buf, 0, len);
+				}
+				
+				outputStream.close();
+				inputStream.close();
+			}catch (IOException e)
+			{
+				try {
+					if (outputStream != null)
+						outputStream.close();
+
+					inputStream.close();
+				}catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public void checkContentPath(String contentPath)
+	{
+		if (contentPath != null
+				&& contentPath.trim().length() != 0) {
+			File contentPathDir = new File(contentPath);
+			//If the path doesn't exist, create it
+			if (!contentPathDir.exists()) {
+				contentPathDir.mkdirs();
+			}
+		}
+	}
 
 }
