@@ -25,9 +25,9 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 
-public final class CMISHelper {
+public final class CmisHelper {
 
-	private CMISHelper(){}
+	private CmisHelper(){}
 
 	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
 

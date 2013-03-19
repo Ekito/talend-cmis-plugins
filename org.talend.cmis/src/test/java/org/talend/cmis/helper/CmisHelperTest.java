@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class CMISHelperTest {
+public class CmisHelperTest {
 
 	private static Session session;
 
@@ -146,7 +146,7 @@ public class CMISHelperTest {
 
 		Document doc = null;
 		try {
-			doc = CMISHelper.createDocument(session, DOCUMENT_1_FOLDER_PATH, DOCUMENT_1_PROPERTIES, DOCUMENT_1_KEYS, null);
+			doc = CmisHelper.createDocument(session, DOCUMENT_1_FOLDER_PATH, DOCUMENT_1_PROPERTIES, DOCUMENT_1_KEYS, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -160,7 +160,7 @@ public class CMISHelperTest {
 		
 		Document doc = null;
 		try {
-			doc = CMISHelper.createOrUpdateDocument(session, DOCUMENT_1_FOLDER_PATH, DOCUMENT_1_PROPERTIES, DOCUMENT_1_KEYS, null);
+			doc = CmisHelper.createOrUpdateDocument(session, DOCUMENT_1_FOLDER_PATH, DOCUMENT_1_PROPERTIES, DOCUMENT_1_KEYS, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -172,7 +172,7 @@ public class CMISHelperTest {
 		
 		Document doc = null;
 		try {
-			doc = CMISHelper.createOrUpdateDocument(session, DOCUMENT_2_FOLDER_PATH, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
+			doc = CmisHelper.createOrUpdateDocument(session, DOCUMENT_2_FOLDER_PATH, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -186,7 +186,7 @@ public class CMISHelperTest {
 		
 		Document doc = null;
 		try {
-			doc = CMISHelper.updateDocument(session, DOCUMENT_2_FOLDER_PATH, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
+			doc = CmisHelper.updateDocument(session, DOCUMENT_2_FOLDER_PATH, DOCUMENT_2_PROPERTIES, DOCUMENT_2_KEYS, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -198,7 +198,7 @@ public class CMISHelperTest {
 		
 		Folder folder = null;
 		try {
-			folder = CMISHelper.createFolder(session, FOLDER_1_FOLDER_PATH, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, false);
+			folder = CmisHelper.createFolder(session, FOLDER_1_FOLDER_PATH, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, false);
 		} catch (Exception e) {
 			Assert.assertTrue(false);
 		}
@@ -211,7 +211,7 @@ public class CMISHelperTest {
 		
 		Folder folder = null;
 		try {
-			folder = CMISHelper.createFolder(session, FOLDER_1_FOLDER_PATH_RECURSIVE, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, false);
+			folder = CmisHelper.createFolder(session, FOLDER_1_FOLDER_PATH_RECURSIVE, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, false);
 		} catch (Exception e) {
 			if (e instanceof CmisObjectNotFoundException)
 				Assert.assertTrue(true);
@@ -227,7 +227,7 @@ public class CMISHelperTest {
 		
 		Folder folder = null;
 		try {
-			folder = CMISHelper.createFolder(session, FOLDER_1_FOLDER_PATH_RECURSIVE, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, true);
+			folder = CmisHelper.createFolder(session, FOLDER_1_FOLDER_PATH_RECURSIVE, FOLDER_1_PROPERTIES, FOLDER_1_PROPERTIES, true);
 			Assert.assertNotNull(folder);
 		} catch (Exception e) {
 			Assert.assertTrue(false);
@@ -239,8 +239,8 @@ public class CMISHelperTest {
 	public void testDeleteDocuments()
 	{
 		try {
-			CMISHelper.deleteCmisObject(session, DOCUMENT_1_KEYS);
-			CMISHelper.deleteCmisObject(session, DOCUMENT_2_KEYS);
+			CmisHelper.deleteCmisObject(session, DOCUMENT_1_KEYS);
+			CmisHelper.deleteCmisObject(session, DOCUMENT_2_KEYS);
 			Assert.assertTrue(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -252,7 +252,7 @@ public class CMISHelperTest {
 	public void testDeleteFolders()
 	{
 		try {
-			CMISHelper.deleteCmisObject(session, FOLDER_1_PROPERTIES, FOLDER_1_FOLDER_PATH);
+			CmisHelper.deleteCmisObject(session, FOLDER_1_PROPERTIES, FOLDER_1_FOLDER_PATH);
 			Assert.assertTrue(true);
 		} catch (Exception e) {
 			e.printStackTrace();
