@@ -35,10 +35,10 @@ public final class CmisHelper {
 		Folder parentFolder =null;
 
 		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-		if (folderPath != null)
-		{
-			parentFolder = (Folder)session.getObjectByPath(folderPath);
-		}
+//		if (folderPath != null)
+//		{
+//			parentFolder = (Folder)session.getObjectByPath(folderPath);
+//		}
 
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
