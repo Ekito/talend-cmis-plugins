@@ -179,16 +179,11 @@ public class SessionManager {
 		{
 			typeDefinitionModels = new ArrayList<TypeDefinitionModel>();
 			// load all the TypeDefinition from the CMIS server.
-			ItemIterable<ObjectType> availableObjectTypesIterable = session.getTypeChildren(baseTypeId, true);
+			ObjectType baseTypeDefinition = session.getTypeDefinition(baseTypeId);
 
-			for (Iterator<ObjectType> iterator = availableObjectTypesIterable
-					.iterator(); iterator.hasNext();) {
-				ObjectType objectType = (ObjectType) iterator.next();
-
-				TypeDefinitionModel typeDefinitionModel = new TypeDefinitionModel(null, objectType);
+			TypeDefinitionModel typeDefinitionModel = new TypeDefinitionModel(null, baseTypeDefinition);
 				
-				typeDefinitionModels.add(typeDefinitionModel);
-			}
+			typeDefinitionModels.add(typeDefinitionModel);
 		}
 		return typeDefinitionModels;
 	}
