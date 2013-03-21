@@ -336,7 +336,7 @@ public final class CmisHelper {
 		return session.getObjectByPath(path);
 	}
 
-	public void extractCMISObjectContent(CmisObject cmisObject, String contentPath)
+	public static void extractCMISObjectContent(CmisObject cmisObject, String contentPath)
 	{
 		if (cmisObject instanceof Document)
 		{
@@ -365,7 +365,7 @@ public final class CmisHelper {
 		}
 	}
 
-	public void extractDocumentContent(Document cmisDocument, String contentPath)
+	private static void extractDocumentContent(Document cmisDocument, String contentPath)
 	{
 		String filename = cmisDocument.getContentStreamFileName();
 
@@ -404,7 +404,7 @@ public final class CmisHelper {
 		}
 	}
 
-	public void checkContentPath(String contentPath)
+	private static void checkContentPath(String contentPath)
 	{
 		if (contentPath != null
 				&& contentPath.trim().length() != 0) {
