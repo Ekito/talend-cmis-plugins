@@ -72,10 +72,13 @@ public class TypeDefinitionModel {
 		
 		propertyDefinitions = new ArrayList<PropertyDefinitionModel>();
 		
-		for (PropertyDefinition<?> propertyDefinition : propertyDefinitionsMap
-				.values()) {
-			PropertyDefinitionModel propertyDefinitionModel = new PropertyDefinitionModel(objectType.getId(), propertyDefinition);
-			propertyDefinitions.add(propertyDefinitionModel);
+		if (propertyDefinitionsMap != null)
+		{
+			for (PropertyDefinition<?> propertyDefinition : propertyDefinitionsMap
+					.values()) {
+				PropertyDefinitionModel propertyDefinitionModel = new PropertyDefinitionModel(objectType.getId(), propertyDefinition);
+				propertyDefinitions.add(propertyDefinitionModel);
+			}
 		}
 		
 	}
