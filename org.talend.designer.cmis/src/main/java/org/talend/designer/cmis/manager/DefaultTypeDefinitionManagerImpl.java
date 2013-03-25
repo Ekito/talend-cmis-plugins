@@ -273,7 +273,8 @@ public class DefaultTypeDefinitionManagerImpl implements TypeDefinitionManager{
 
 		// handling previously know metadata ; using a copy of their list so
 		// we're able do removes in it
-		for (Map<String, String> metadataMappingRow : metadataMappingTable) {
+		for (Map<String, String> metadataMappingRow : new ArrayList<Map<String, String>>(
+				metadataMappingTable)) {
 			String propertyId = metadataMappingRow.get(PARAM_ITEM_ID);
 
 
