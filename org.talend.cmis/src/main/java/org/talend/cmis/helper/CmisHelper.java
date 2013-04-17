@@ -132,7 +132,7 @@ public final class CmisHelper {
 	{
 		Folder parentFolder =null;
 
-		if (folderPath != null)
+		if (folderPath != null && !folderPath.equals(""))
 		{
 			parentFolder = (Folder)session.getObjectByPath(folderPath);
 		}
@@ -182,7 +182,7 @@ public final class CmisHelper {
 
 				targetFolder = createFolder(session, grandParentFolderPath, parentProperties, parentProperties, recursive);
 			}else {
-				throw e;
+				throw new CmisObjectNotFoundException(parentFolderPath + " not found", e);
 			}
 		}
 
