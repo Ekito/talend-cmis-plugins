@@ -31,18 +31,19 @@ public final class CmisHelper {
 
 	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
 
-		//Check that the document does not already exist
+		//Check that the document does not already exist in the folder
 		Folder parentFolder =null;
 
-		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-//		if (folderPath != null)
-//		{
-//			parentFolder = (Folder)session.getObjectByPath(folderPath);
-//		}
+		//Issue with nuxeo 5.6 : query with IN_FOLDER criteria doesn't work 
+		if (folderPath != null)
+		{
+			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		}
 
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
-		if (queryResult != null && queryResult.getTotalNumItems() > 0)
+		//Issue with Alfresco 4.0 : getTotalNumItems() return -1 everytime
+		if (queryResult != null && queryResult.getPageNumItems() > 0)
 		{
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys));
 		}
@@ -56,21 +57,20 @@ public final class CmisHelper {
 
 		Folder parentFolder =null;
 
-		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-		//		if (folderPath != null)
-		//		{
-		//			parentFolder = (Folder)session.getObjectByPath(folderPath);
-		//		}
+		if (folderPath != null)
+		{
+			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		}
 
 		//Check if the document already exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
 		Document document = null;
-		if (queryResult == null || queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
 			document = createDocument(session, folderPath, properties, contentStreamFilePath);
 		}
-		else if (queryResult.getTotalNumItems() == 1)
+		else if (queryResult.getPageNumItems() == 1)
 		{
 			for (QueryResult result : queryResult) {
 
@@ -91,21 +91,20 @@ public final class CmisHelper {
 
 		Folder parentFolder =null;
 
-		//		Don't use parentFolder path for query as IN_FOLDER predicate does'nt work with Nuxeo 5.6
-		//		if (folderPath != null)
-		//		{
-		//			parentFolder = (Folder)session.getObjectByPath(folderPath);
-		//		}
+		if (folderPath != null)
+		{
+			parentFolder = (Folder)session.getObjectByPath(folderPath);
+		}
 
 		//Check if the document already exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
 		Document document = null;
-		if (queryResult == null || queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
-			throw new Exception("No document exists with the following criteria : " + formatPredicate(keys));
+			throw new Exception("No document exists with the following criteria : " + formatPredicate(keys, parentFolder));
 		}
-		else if (queryResult.getTotalNumItems() == 1)
+		else if (queryResult.getPageNumItems() == 1)
 		{
 			for (QueryResult result : queryResult) {
 
@@ -139,11 +138,11 @@ public final class CmisHelper {
 		//Check if the object exists
 		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
 
-		if (queryResult == null || queryResult.getTotalNumItems() == 0)
+		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
 			throw new Exception("No object exists with the following criteria : " + formatPredicate(keys,parentFolder));
 		}
-		else if (queryResult.getTotalNumItems() == 1)
+		else if (queryResult.getPageNumItems() == 1)
 		{
 			for (QueryResult result : queryResult) {
 
@@ -188,7 +187,7 @@ public final class CmisHelper {
 
 		ItemIterable<QueryResult> queryResult = find(session, keys, targetFolder);
 
-		if (queryResult != null && queryResult.getTotalNumItems() > 0)
+		if (queryResult != null && queryResult.getPageNumItems() > 0)
 		{
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys, targetFolder));
 		}
@@ -214,16 +213,17 @@ public final class CmisHelper {
 			Document document, Map<String, Object> properties,
 			String contentStreamFilePath) throws FileNotFoundException {
 
-		if (!document.isVersionSeriesCheckedOut())
-		{
-			ObjectId objectId = document.checkOut();
-			document = (Document) session.getObject(objectId);
-		}else
-		{
-			String objectId = document.getVersionSeriesCheckedOutId();
-			document = (Document) session.getObject(session.createObjectId(objectId));
-		}
-		document.checkIn(false, properties, null, "new version from Talend");
+//		if (!document.isVersionSeriesCheckedOut())
+//		{
+//			ObjectId objectId = document.checkOut();
+//			document = (Document) session.getObject(objectId);
+//		}else
+//		{
+//			String objectId = document.getVersionSeriesCheckedOutId();
+//			document = (Document) session.getObject(session.createObjectId(objectId));
+//		}
+//		document.checkIn(false, properties, null, "new version from Talend");
+
 		ContentStream contentStream = null;
 
 		if (contentStreamFilePath != null)
@@ -232,8 +232,13 @@ public final class CmisHelper {
 		}
 		if (contentStream != null)
 		{
-			document = document.setContentStream(contentStream, true);
+			//AtomPub binding does not return an id
+			document.setContentStream(contentStream, true);
 		}
+		
+		ObjectId documentId = document.updateProperties(properties, true);
+		document = (Document) session.getObject(documentId);
+		
 		return document;
 	}
 
