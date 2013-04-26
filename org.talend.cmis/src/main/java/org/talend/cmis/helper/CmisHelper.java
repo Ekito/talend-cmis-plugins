@@ -1,13 +1,13 @@
 package org.talend.cmis.helper;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.FileNameMap;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,12 +24,13 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
 public final class CmisHelper {
 
 	private CmisHelper(){}
 
-	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		//Check that the document does not already exist in the folder
 		Folder parentFolder =null;
@@ -48,12 +49,12 @@ public final class CmisHelper {
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys));
 		}
 
-		Document document = createDocument(session, folderPath, properties, contentStreamFilePath);
+		Document document = createDocument(session, folderPath, properties, contentStreamUrl);
 
 		return document;
 	}
 
-	public static Document createOrUpdateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+	public static Document createOrUpdateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		Folder parentFolder =null;
 
@@ -68,7 +69,7 @@ public final class CmisHelper {
 		Document document = null;
 		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
-			document = createDocument(session, folderPath, properties, contentStreamFilePath);
+			document = createDocument(session, folderPath, properties, contentStreamUrl);
 		}
 		else if (queryResult.getPageNumItems() == 1)
 		{
@@ -76,7 +77,7 @@ public final class CmisHelper {
 
 				String objectId = result.getPropertyValueByQueryName(PropertyIds.OBJECT_ID);
 				document = (Document) session.getObject(session.createObjectId(objectId));
-				document = updateDocument(session, document, properties, contentStreamFilePath);
+				document = updateDocument(session, document, properties, contentStreamUrl);
 			}
 		}else
 		{
@@ -87,7 +88,7 @@ public final class CmisHelper {
 		return document;
 	}
 
-	public static Document updateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, String contentStreamFilePath) throws Exception {
+	public static Document updateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		Folder parentFolder =null;
 
@@ -110,7 +111,7 @@ public final class CmisHelper {
 
 				String objectId = result.getPropertyValueByQueryName(PropertyIds.OBJECT_ID);
 				document = (Document) session.getObject(session.createObjectId(objectId));
-				document = updateDocument(session, document, properties, contentStreamFilePath);
+				document = updateDocument(session, document, properties, contentStreamUrl);
 			}
 
 		}else
@@ -197,12 +198,12 @@ public final class CmisHelper {
 		return folder;
 	}
 
-	private static Document createDocument(Session session, String folderPath, Map<String, Object> properties, String contentStreamFilePath) throws FileNotFoundException
+	private static Document createDocument(Session session, String folderPath, Map<String, Object> properties, URL contentStreamURL) throws FileNotFoundException
 	{
 		//Retrieve the folder from path
 		Folder targetFolder = (Folder)session.getObjectByPath(folderPath);
 
-		ContentStream contentStream = createContentStream(session, contentStreamFilePath);
+		ContentStream contentStream = createContentStream(session, contentStreamURL);
 
 		Document document = targetFolder.createDocument(properties, contentStream, org.apache.chemistry.opencmis.commons.enums.VersioningState.MAJOR);
 
@@ -211,8 +212,9 @@ public final class CmisHelper {
 
 	private static Document updateDocument(Session session,
 			Document document, Map<String, Object> properties,
-			String contentStreamFilePath) throws FileNotFoundException {
+			URL contentStreamURL) throws FileNotFoundException {
 
+//		For Nuxeo, document are by default PWC
 //		if (!document.isVersionSeriesCheckedOut())
 //		{
 //			ObjectId objectId = document.checkOut();
@@ -226,9 +228,9 @@ public final class CmisHelper {
 
 		ContentStream contentStream = null;
 
-		if (contentStreamFilePath != null)
+		if (contentStreamURL != null)
 		{
-			contentStream = createContentStream(session, contentStreamFilePath);
+			contentStream = createContentStream(session, contentStreamURL);
 		}
 		if (contentStream != null)
 		{
@@ -242,24 +244,30 @@ public final class CmisHelper {
 		return document;
 	}
 
-	private static ContentStream createContentStream(Session session, String contentStreamFilePath) throws FileNotFoundException
+	private static ContentStream createContentStream(Session session, URL contentStreamURL)
 	{
 		ContentStream contentStream = null;
 
-		if (contentStreamFilePath != null)
+		if (contentStreamURL != null)
 		{
-			File contentFile = new File(contentStreamFilePath);
-
 			FileNameMap fileNameMap = URLConnection.getFileNameMap();
-			String mimetype = fileNameMap.getContentTypeFor(contentStreamFilePath);
+			String mimetype = fileNameMap.getContentTypeFor(contentStreamURL.getFile());
 
-			FileInputStream contentFileInputStream = new FileInputStream(contentFile);
-			long length = contentFile.length();
+			URLConnection contentStreamConn;
+			try {
+				contentStreamConn = contentStreamURL.openConnection();
+			
+		    int length = contentStreamConn.getContentLength();
+		      
+			InputStream contentInputStream = contentStreamConn.getInputStream();
 			contentStream = session.getObjectFactory()
-					.createContentStream(contentFile.getName(),
+					.createContentStream(contentStreamURL.getFile(),
 							length,
 							mimetype,
-							contentFileInputStream);
+							contentInputStream);
+			} catch (IOException e) {
+				throw new CmisRuntimeException("An error occured while creating contentStream", e);
+			}
 		}
 
 		return contentStream;
