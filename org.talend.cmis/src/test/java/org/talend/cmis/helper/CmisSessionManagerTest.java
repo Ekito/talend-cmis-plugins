@@ -48,15 +48,17 @@ import org.junit.runners.Parameterized.Parameters;
  *
  */
 @RunWith(Parameterized.class)
-public class CmisHelperTest extends TestCase{
+public class CmisSessionManagerTest extends TestCase{
 
 	public static HashMap<String, String> testSuiteParameters = null;
 	private static Session session;
+	private static CmisSessionManager cmisSessionManager;
 
-	public CmisHelperTest(String name, HashMap<String, String> map) {
+	public CmisSessionManagerTest(String name, HashMap<String, String> map) {
 		super(name);
 		testSuiteParameters = map;
 		createSession();
+		createCmisManager();
 
 	}
 
@@ -65,7 +67,7 @@ public class CmisHelperTest extends TestCase{
 
 		ArrayList<Object[]> configs = new ArrayList<Object[]>();
 
-		String path = CmisHelperTest.class.getClassLoader().getResource("params/").getPath(); 
+		String path = CmisSessionManagerTest.class.getClassLoader().getResource("params/").getPath(); 
 
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles(); 
@@ -114,7 +116,7 @@ public class CmisHelperTest extends TestCase{
 
 		Document doc = null;
 		try {
-			doc = CmisHelper.createDocument(session, getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley1.png"));
+			doc = cmisSessionManager.createDocument(getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley1.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -131,7 +133,7 @@ public class CmisHelperTest extends TestCase{
 			//First document version initialization
 			createDocument();
 
-			doc = CmisHelper.createOrUpdateDocument(session, getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley2.png"));
+			doc = cmisSessionManager.createOrUpdateDocument(getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley2.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -143,7 +145,7 @@ public class CmisHelperTest extends TestCase{
 
 		Document doc = null;
 		try {
-			doc = CmisHelper.createOrUpdateDocument(session, getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley1.png"));
+			doc = cmisSessionManager.createOrUpdateDocument(getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley1.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -158,7 +160,7 @@ public class CmisHelperTest extends TestCase{
 			//First document version initialization
 			createDocument();
 
-			doc = CmisHelper.updateDocument(session, getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley2.png"));
+			doc = cmisSessionManager.updateDocument(getRootFolderPath(), getDocumentProperties(), getDocumentKeys(), getContentStreamURL("smiley2.png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -170,7 +172,7 @@ public class CmisHelperTest extends TestCase{
 
 		Folder folder = null;
 		try {
-			folder = CmisHelper.createFolder(session, getRootFolderPath(), getFolderProperties(), getFolderProperties(), false);
+			folder = cmisSessionManager.createFolder(getRootFolderPath(), getFolderProperties(), getFolderProperties(), false);
 		} catch (Exception e) {
 			Assert.assertTrue(false);
 		}
@@ -183,7 +185,7 @@ public class CmisHelperTest extends TestCase{
 
 		Folder folder = null;
 		try {
-			folder = CmisHelper.createFolder(session, getRootFolderPath() + "/ParentNotExists", getFolderProperties(), getFolderProperties(), false);
+			folder = cmisSessionManager.createFolder(getRootFolderPath() + "/ParentNotExists", getFolderProperties(), getFolderProperties(), false);
 		} catch (Exception e) {
 			if (e instanceof CmisObjectNotFoundException)
 				Assert.assertTrue(true);
@@ -199,7 +201,7 @@ public class CmisHelperTest extends TestCase{
 
 		Folder folder = null;
 		try {
-			folder = CmisHelper.createFolder(session, getRootFolderPath()  + "/Folder_00/Folder_01/", getFolderProperties(), getFolderProperties(), true);
+			folder = cmisSessionManager.createFolder(getRootFolderPath()  + "/Folder_00/Folder_01/", getFolderProperties(), getFolderProperties(), true);
 			Assert.assertNotNull(folder);
 		} catch (Exception e) {
 			Assert.assertTrue(false);
@@ -213,7 +215,7 @@ public class CmisHelperTest extends TestCase{
 		try {
 			createFolder();
 
-			CmisHelper.deleteCmisObject(session, getFolderProperties(), getRootFolderPath());
+			cmisSessionManager.deleteCmisObject(getFolderProperties(), getRootFolderPath());
 			Assert.assertTrue(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -227,7 +229,7 @@ public class CmisHelperTest extends TestCase{
 		try {
 			createDocument();
 
-			CmisHelper.deleteCmisObject(session, getDocumentProperties(), getRootFolderPath());
+			cmisSessionManager.deleteCmisObject(getDocumentProperties(), getRootFolderPath());
 			Assert.assertTrue(true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -278,7 +280,7 @@ public class CmisHelperTest extends TestCase{
 
 	private URL getContentStreamURL(String contentFileName) {
 
-		URL contentFolder = CmisHelperTest.class.getClassLoader().getResource("content/" + contentFileName);
+		URL contentFolder = CmisSessionManagerTest.class.getClassLoader().getResource("content/" + contentFileName);
 
 		return contentFolder;
 	}
@@ -286,7 +288,7 @@ public class CmisHelperTest extends TestCase{
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static HashMap<String, String> getTestSuiteParameters(String resourcePath) throws IOException
 	{
-		InputStream in = CmisHelperTest.class.getClassLoader().getResourceAsStream(resourcePath);
+		InputStream in = CmisSessionManagerTest.class.getClassLoader().getResourceAsStream(resourcePath);
 		Properties properties = new Properties();
 		properties.load(in);
 		in.close();
@@ -335,6 +337,11 @@ public class CmisHelperTest extends TestCase{
 
 		HashMap<String, String> sessionParameters = getSessionParameters(testSuiteParameters);
 		session = sf.createSession(sessionParameters);
+	}
+	
+	private void createCmisManager() {
+		cmisSessionManager = new CmisSessionManager(session);
+		
 	}
 
 	private Map<String,Object> getDocumentProperties()

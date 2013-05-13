@@ -26,11 +26,17 @@ import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
-public final class CmisHelper {
+public class CmisSessionManager {
 
-	private CmisHelper(){}
+	private Session session;
+	private Boolean allVersionSearchable;
 
-	public static Document createDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
+	public CmisSessionManager(Session session){
+		this.session = session;
+		allVersionSearchable = session.getRepositoryInfo().getCapabilities().isAllVersionsSearchableSupported();
+	}
+
+	public Document createDocument(String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		//Check that the document does not already exist in the folder
 		Folder parentFolder =null;
@@ -41,7 +47,7 @@ public final class CmisHelper {
 			parentFolder = (Folder)session.getObjectByPath(folderPath);
 		}
 
-		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
+		ItemIterable<QueryResult> queryResult = find(keys, parentFolder);
 
 		//Issue with Alfresco 4.0 : getTotalNumItems() return -1 everytime
 		if (queryResult != null && queryResult.getPageNumItems() > 0)
@@ -49,12 +55,12 @@ public final class CmisHelper {
 			throw new Exception("An object already exists with the following criteria : " + formatPredicate(keys));
 		}
 
-		Document document = createDocument(session, folderPath, properties, contentStreamUrl);
+		Document document = createDocument(folderPath, properties, contentStreamUrl);
 
 		return document;
 	}
 
-	public static Document createOrUpdateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
+	public Document createOrUpdateDocument(String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		Folder parentFolder =null;
 
@@ -64,12 +70,12 @@ public final class CmisHelper {
 		}
 
 		//Check if the document already exists
-		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
+		ItemIterable<QueryResult> queryResult = find(keys, parentFolder);
 
 		Document document = null;
 		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
-			document = createDocument(session, folderPath, properties, contentStreamUrl);
+			document = createDocument(folderPath, properties, contentStreamUrl);
 		}
 		else if (queryResult.getPageNumItems() == 1)
 		{
@@ -77,7 +83,7 @@ public final class CmisHelper {
 
 				String objectId = result.getPropertyValueByQueryName(PropertyIds.OBJECT_ID);
 				document = (Document) session.getObject(session.createObjectId(objectId));
-				document = updateDocument(session, document, properties, contentStreamUrl);
+				document = updateDocument(document, properties, contentStreamUrl);
 			}
 		}else
 		{
@@ -88,7 +94,7 @@ public final class CmisHelper {
 		return document;
 	}
 
-	public static Document updateDocument(Session session, String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
+	public Document updateDocument(String folderPath, Map<String, Object> properties, Map<String, Object> keys, URL contentStreamUrl) throws Exception {
 
 		Folder parentFolder =null;
 
@@ -98,7 +104,7 @@ public final class CmisHelper {
 		}
 
 		//Check if the document already exists
-		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
+		ItemIterable<QueryResult> queryResult = find(keys, parentFolder);
 
 		Document document = null;
 		if (queryResult == null || queryResult.getPageNumItems() <= 0)
@@ -111,7 +117,7 @@ public final class CmisHelper {
 
 				String objectId = result.getPropertyValueByQueryName(PropertyIds.OBJECT_ID);
 				document = (Document) session.getObject(session.createObjectId(objectId));
-				document = updateDocument(session, document, properties, contentStreamUrl);
+				document = updateDocument(document, properties, contentStreamUrl);
 			}
 
 		}else
@@ -123,12 +129,12 @@ public final class CmisHelper {
 		return document;
 	}
 
-	public static void deleteCmisObject(Session session, Map<String, Object> keys) throws Exception
+	public void deleteCmisObject(Map<String, Object> keys) throws Exception
 	{
-		deleteCmisObject(session, keys, null);
+		deleteCmisObject(keys, null);
 	}
 
-	public static void deleteCmisObject(Session session, Map<String, Object> keys, String folderPath) throws Exception
+	public void deleteCmisObject(Map<String, Object> keys, String folderPath) throws Exception
 	{
 		Folder parentFolder =null;
 
@@ -137,7 +143,7 @@ public final class CmisHelper {
 			parentFolder = (Folder)session.getObjectByPath(folderPath);
 		}
 		//Check if the object exists
-		ItemIterable<QueryResult> queryResult = find(session, keys, parentFolder);
+		ItemIterable<QueryResult> queryResult = find(keys, parentFolder);
 
 		if (queryResult == null || queryResult.getPageNumItems() <= 0)
 		{
@@ -160,7 +166,7 @@ public final class CmisHelper {
 	}
 
 
-	public static Folder createFolder(Session session, String parentFolderPath, Map<String, Object> properties, Map<String, Object> keys, boolean recursive) throws Exception
+	public Folder createFolder(String parentFolderPath, Map<String, Object> properties, Map<String, Object> keys, boolean recursive) throws Exception
 	{
 		//Retrieve the parent folder from path
 		Folder targetFolder = null;
@@ -180,13 +186,13 @@ public final class CmisHelper {
 				//By default, parent folder is created with the same type as it child
 				parentProperties.put(PropertyIds.OBJECT_TYPE_ID, properties.get(PropertyIds.OBJECT_TYPE_ID));
 
-				targetFolder = createFolder(session, grandParentFolderPath, parentProperties, parentProperties, recursive);
+				targetFolder = createFolder(grandParentFolderPath, parentProperties, parentProperties, recursive);
 			}else {
 				throw new CmisObjectNotFoundException(parentFolderPath + " not found", e);
 			}
 		}
 
-		ItemIterable<QueryResult> queryResult = find(session, keys, targetFolder);
+		ItemIterable<QueryResult> queryResult = find(keys, targetFolder);
 
 		if (queryResult != null && queryResult.getPageNumItems() > 0)
 		{
@@ -198,20 +204,19 @@ public final class CmisHelper {
 		return folder;
 	}
 
-	private static Document createDocument(Session session, String folderPath, Map<String, Object> properties, URL contentStreamURL) throws FileNotFoundException
+	private Document createDocument(String folderPath, Map<String, Object> properties, URL contentStreamURL) throws FileNotFoundException
 	{
 		//Retrieve the folder from path
 		Folder targetFolder = (Folder)session.getObjectByPath(folderPath);
 
-		ContentStream contentStream = createContentStream(session, contentStreamURL);
+		ContentStream contentStream = createContentStream(contentStreamURL);
 
 		Document document = targetFolder.createDocument(properties, contentStream, org.apache.chemistry.opencmis.commons.enums.VersioningState.MAJOR);
 
 		return document;
 	}
 
-	private static Document updateDocument(Session session,
-			Document document, Map<String, Object> properties,
+	private Document updateDocument(Document document, Map<String, Object> properties,
 			URL contentStreamURL) throws FileNotFoundException {
 
 //		For Nuxeo, document are by default PWC
@@ -230,7 +235,7 @@ public final class CmisHelper {
 
 		if (contentStreamURL != null)
 		{
-			contentStream = createContentStream(session, contentStreamURL);
+			contentStream = createContentStream(contentStreamURL);
 		}
 		if (contentStream != null)
 		{
@@ -244,7 +249,7 @@ public final class CmisHelper {
 		return document;
 	}
 
-	private static ContentStream createContentStream(Session session, URL contentStreamURL)
+	private ContentStream createContentStream(URL contentStreamURL)
 	{
 		ContentStream contentStream = null;
 
@@ -273,15 +278,13 @@ public final class CmisHelper {
 		return contentStream;
 	}
 
-	private static ItemIterable<QueryResult> find(Session session,
-			Map<String, Object> keys) {
+	private ItemIterable<QueryResult> find(Map<String, Object> keys) {
 
-		return find(session, keys, null);
+		return find(keys, null);
 
 	}
 
-	private static ItemIterable<QueryResult> find(Session session,
-			Map<String, Object> keys, ObjectId folderId) {
+	private ItemIterable<QueryResult> find(Map<String, Object> keys, ObjectId folderId) {
 
 		ItemIterable<QueryResult> queryResult = null;
 
@@ -298,18 +301,18 @@ public final class CmisHelper {
 			.append(" WHERE ")
 			.append(formatPredicate(keys, folderId));
 
-			queryResult = session.query(queryStatement.toString(), false);
+			queryResult = session.query(queryStatement.toString(), allVersionSearchable);
 		}
 		return queryResult;
 
 	}
 
-	private static String formatPredicate(Map<String, Object> keys)
+	private String formatPredicate(Map<String, Object> keys)
 	{
 		return formatPredicate(keys, null);
 	}
 
-	private static String formatPredicate(Map<String, Object> keys, ObjectId folderId)
+	private String formatPredicate(Map<String, Object> keys, ObjectId folderId)
 	{
 		StringBuilder predicate = new StringBuilder();
 		for (Entry<String,Object> keyEntry : keys.entrySet()) {
@@ -344,12 +347,12 @@ public final class CmisHelper {
 		return predicate.toString();
 	}
 
-	public static CmisObject getObjectByPath(Session session, String path)
+	public CmisObject getObjectByPath(String path)
 	{
 		return session.getObjectByPath(path);
 	}
 
-	public static void extractCMISObjectContent(CmisObject cmisObject, String contentPath)
+	public void extractCMISObjectContent(CmisObject cmisObject, String contentPath)
 	{
 		if (cmisObject instanceof Document)
 		{
@@ -378,7 +381,7 @@ public final class CmisHelper {
 		}
 	}
 
-	private static void extractDocumentContent(Document cmisDocument, String contentPath)
+	private void extractDocumentContent(Document cmisDocument, String contentPath)
 	{
 		String filename = cmisDocument.getContentStreamFileName();
 
@@ -417,7 +420,7 @@ public final class CmisHelper {
 		}
 	}
 
-	private static void checkContentPath(String contentPath)
+	private void checkContentPath(String contentPath)
 	{
 		if (contentPath != null
 				&& contentPath.trim().length() != 0) {
