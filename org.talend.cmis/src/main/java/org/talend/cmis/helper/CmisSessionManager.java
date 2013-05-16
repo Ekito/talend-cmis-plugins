@@ -23,6 +23,7 @@ import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
@@ -155,7 +156,14 @@ public class CmisSessionManager {
 
 				String objectId = result.getPropertyValueByQueryName(PropertyIds.OBJECT_ID);
 				CmisObject object = session.getObject(session.createObjectId(objectId));
-				object.delete(true);
+				
+				if (object instanceof Folder)
+				{
+					((Folder)object).deleteTree(true, UnfileObject.DELETESINGLEFILED, false);
+				}else
+				{
+					object.delete(true);
+				}
 			}
 
 		}else
