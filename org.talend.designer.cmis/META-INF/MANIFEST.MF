@@ -7,6 +7,7 @@ Bundle-Vendor: Ekito
 Require-Bundle: org.talend.libraries.apache.chemistry,
  org.eclipse.core.runtime,
  org.talend.core,
+ org.talend.core.ui,
  org.talend.commons.ui,
  org.talend.libraries.dom4j-jaxen,
  org.talend.designer.codegen,
